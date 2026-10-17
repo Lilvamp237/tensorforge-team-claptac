@@ -46,10 +46,15 @@ def set_status(domain: str, listing: str | None, reason: str, by: str) -> None:
     config.REPUTATION_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
-def add_report(url: str, verdict: str, comment: str = "") -> dict:
-    """Record a user report ('scam' or 'legit'); escalate the site to an analyst once reports pile up."""
+def add_report(url: str, verdict: str, comment: str = "", rater_id: str | None = None) -> dict:
+    """Record a user report ('scam' or 'legit'); escalate the site to an analyst once reports pile up.
+    `rater_id` is stored only as a salted hash and weights the report in community.signal()."""
+    from .community import rater_hash
+
     domain = domain_of(url)
-    record = _append(config.REPORTS_LOG, {"domain": domain, "url": url, "verdict": verdict, "comment": comment[:500]})
+    rater = rater_hash(rater_id) if rater_id else None
+    record = _append(config.REPORTS_LOG, {"domain": domain, "url": url, "verdict": verdict, "comment": comment[:500],
+                                          "rater": rater})
     scam_reports = sum(r["domain"] == domain and r["verdict"] == "scam" for r in _read(config.REPORTS_LOG))
     review_id = f"domain:{domain}"
     already_queued = any(p["review_id"] == review_id for p in pending_reviews())
