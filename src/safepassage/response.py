@@ -25,7 +25,7 @@ def check_drift() -> dict:
     now = report["n"] >= config.DRIFT_MIN_SCANS and report["drift"]
     if not now and drift_active():
         sig, thr = report.get("signals", {}), report.get("thresholds", {})
-        now = any(sig.get(k, 0.0) > CLEAR_MARGIN * t for k, t in thr.items())
+        now = any(sig.get(k, 0.0) >= CLEAR_MARGIN * t for k, t in thr.items())
     if now != drift_active():
         raise_alert("drift_detected" if now else "drift_cleared", report)
     return {**report, "drift": now}
