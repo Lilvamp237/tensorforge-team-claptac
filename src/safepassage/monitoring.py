@@ -32,7 +32,28 @@ def read_log() -> list[dict]:
 
 
 def enqueue_review(record: dict) -> None:
-    _append(config.REVIEW_QUEUE, record)
+    """Queue an item for a human. `review_id` is the scan_id for scans, or `domain:<host>` for reported sites."""
+    _append(config.REVIEW_QUEUE, {"review_id": record.get("scan_id"), **record})
+
+
+def pending_reviews() -> list[dict]:
+    done = {r["review_id"] for r in _read(config.REVIEWED_LOG)}
+    pending = {}
+    for item in _read(config.REVIEW_QUEUE):
+        if item["review_id"] not in done:
+            pending[item["review_id"]] = item  # latest entry wins for repeated items
+    return list(pending.values())
+
+
+def resolve_review(review_id: str, decision: str, reviewer: str = "analyst") -> dict:
+    item = next((i for i in pending_reviews() if i["review_id"] == review_id), None)
+    if item is None:
+        raise KeyError(review_id)
+    return _append(config.REVIEWED_LOG, {**item, "decision": decision, "reviewer": reviewer})
+
+
+def reviewed() -> list[dict]:
+    return _read(config.REVIEWED_LOG)
 
 
 def raise_alert(kind: str, details: dict) -> None:

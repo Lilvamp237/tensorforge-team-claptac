@@ -13,6 +13,10 @@ REGISTRY_PATH = DATA_DIR / "processed" / "registry.csv"
 PREDICTION_LOG = LOGS_DIR / "predictions.jsonl"
 REVIEW_QUEUE = LOGS_DIR / "review_queue.jsonl"
 ALERT_LOG = LOGS_DIR / "alerts.jsonl"
+REVIEWED_LOG = LOGS_DIR / "reviewed.jsonl"
+REPORTS_LOG = LOGS_DIR / "reports.jsonl"
+REPUTATION_PATH = LOGS_DIR / "reputation.json"
+FEEDBACK_PATH = DATA_DIR / "processed" / "feedback.csv"
 
 MODEL_VERSION = "safepassage-0.1.0"
 CATEGORIES = ["local_job", "foreign_job", "student_visa", "visa_pr"]

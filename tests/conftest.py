@@ -7,7 +7,8 @@ from safepassage import config, response
 def isolated_logs(tmp_path, monkeypatch):
     """Point every log file at a temp dir so tests never touch logs/, and start each test drift-free."""
     monkeypatch.setattr(config, "LOGS_DIR", tmp_path)
-    for name in ("PREDICTION_LOG", "REVIEW_QUEUE", "ALERT_LOG"):
+    monkeypatch.setattr(config, "FEEDBACK_PATH", tmp_path / "feedback.csv")
+    for name in ("PREDICTION_LOG", "REVIEW_QUEUE", "ALERT_LOG", "REVIEWED_LOG", "REPORTS_LOG", "REPUTATION_PATH"):
         monkeypatch.setattr(config, name, tmp_path / getattr(config, name).name)
     monkeypatch.setattr(config, "ALERT_WEBHOOK_URL", None)
     response.reset()

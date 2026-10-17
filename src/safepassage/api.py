@@ -1,11 +1,14 @@
 """REST adapter. Owner: Person B."""
 
+from typing import Literal
+
 from fastapi import FastAPI, HTTPException, UploadFile
 from pydantic import BaseModel, Field, HttpUrl
 
 from . import __version__
 from .drift import drift_report
 from .fetch import UnsafeURL
+from .monitoring import pending_reviews, read_alerts, resolve_review
 from .schema import ScanResult
 from .service import model_loaded, scan_file, scan_public_url, scan_text
 
@@ -46,3 +49,26 @@ async def scan_file_endpoint(file: UploadFile):
 @app.get("/api/v1/drift")
 def drift():
     return drift_report()
+
+
+class ReviewDecision(BaseModel):
+    decision: Literal["scam", "legit", "block", "allow", "dismiss"]
+    reviewer: str = "analyst"
+
+
+@app.get("/api/v1/reviews")
+def list_reviews():
+    return pending_reviews()
+
+
+@app.post("/api/v1/reviews/{review_id}")
+def decide_review(review_id: str, body: ReviewDecision):
+    try:
+        return resolve_review(review_id, body.decision, body.reviewer)
+    except KeyError:
+        raise HTTPException(404, "No pending review with that id")
+
+
+@app.get("/api/v1/alerts")
+def list_alerts():
+    return read_alerts()
