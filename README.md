@@ -115,6 +115,7 @@ Choose transport **Streamable HTTP** and URL `http://localhost:8001/mcp`, then c
 | POST | `/api/v1/scans/text` | Scan pasted text (optional `url` for list checks) |
 | POST | `/api/v1/scans/url` | Fetch and scan a public page |
 | POST | `/api/v1/scans/file` | Scan an uploaded PDF/TXT |
+| POST | `/api/v1/scans/audio` | Scan a voice note (mp3/wav/m4a/ogg, up to 3 min and 10 MB; optional `?language=en\|ta\|si`). Returns the result plus `extracted_text` (what we heard). The first call downloads the Whisper *small* model (~460 MB). |
 | GET | `/api/v1/drift` | Current drift signals |
 | GET | `/api/v1/alerts` | Alert history |
 | GET / POST | `/api/v1/reviews`, `/api/v1/reviews/{id}` | Review queue and analyst decisions |
@@ -263,4 +264,5 @@ Every one of these people passes through channels we can sit in: SLBFE registrat
 - Much of the Sri Lankan training data is synthetic, and Sinhala and Singlish precision is lower (0.64–0.69). Analyst-confirmed labels from the review queue are the route to real-world data.
 - Mixed traffic with only about 25% new-tactic offers is detected in 20% of windows, so early drift is caught later than full drift.
 - The verifier is deterministic (registry and rule checks). There is no LLM claim checker yet.
-- Image (screenshot) OCR and voice-note transcription are not implemented. Text, links and PDFs are.
+- Image (screenshot) OCR is not implemented. Text, links, PDFs and voice notes are.
+- Voice notes are transcribed with Whisper *small* on CPU. It handles English and Tamil reasonably but is **weak on Sinhala**, so Sinhala voice notes may be scored on a poor transcript; the transcript is shown to the user and kept in the review queue so analysts can see what was heard. Uploaded audio is never stored.
