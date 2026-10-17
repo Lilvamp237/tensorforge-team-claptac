@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,6 +21,10 @@ CATEGORIES = ["local_job", "foreign_job", "student_visa", "visa_pr"]
 HIGH_RISK = 0.7
 MEDIUM_RISK = 0.4
 NOVELTY_THRESHOLD = 0.6
+
+# Drift response: no verdict until this many recent scans; optional webhook for alerts.
+DRIFT_MIN_SCANS = 20
+ALERT_WEBHOOK_URL = os.environ.get("ALERT_WEBHOOK_URL")
 
 # Limits for fetching user-submitted URLs.
 FETCH_TIMEOUT_S = 10

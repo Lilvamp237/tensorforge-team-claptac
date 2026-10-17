@@ -8,6 +8,7 @@ from .features import describe, find_red_flags
 from .model import ScamModel, risk_label
 from .monitoring import enqueue_review, log_prediction
 from .novelty import campaign, novelty
+from .response import check_drift, drift_active
 from .schema import Risk, ScanResult
 from .verify import verify
 
@@ -26,11 +27,15 @@ def scan_text(text: str, source: str = "text") -> ScanResult:
     content = extract_content(text)
     nov = novelty(text)
     label = risk_label(p)
+    needs_review = label == "medium" or nov.score >= NOVELTY_THRESHOLD
+    if drift_active():
+        # Safe fallback: while the model is drifting, a human checks anything that isn't clearly low risk.
+        needs_review = needs_review or label == "high"
     result = ScanResult(
         scan_id=f"scan_{uuid.uuid4().hex[:8]}",
         source=source,
         risk=Risk(label=label, probability=round(p, 4)),
-        needs_review=label == "medium" or nov.score >= NOVELTY_THRESHOLD,
+        needs_review=needs_review,
         content=content,
         indicators=describe(flags),
         verification=verify(text, content),
@@ -41,6 +46,7 @@ def scan_text(text: str, source: str = "text") -> ScanResult:
     log_prediction(record)
     if result.needs_review:
         enqueue_review({**record, "text": text[:2000]})
+    check_drift()
     return result
 
 
