@@ -48,18 +48,23 @@ SLOTS = {
     },
 }
 SCAM_SALARY = {
-    "foreign_job": ["Rs. 450,000", "Rs. 600,000", "USD 3,000", "Rs. 850,000", "QAR 9,000", "USD 4,500"],
-    "local_job": ["Rs. 5,000 per day", "Rs. 150,000 per month", "Rs. 8,000 daily", "Rs. 250,000 monthly"],
+    "foreign_job": ["Rs. 450,000", "Rs. 600,000", "USD 3,000", "Rs. 850,000", "QAR 9,000", "USD 4,500",
+                    "Rs 600k", "6 lakhs", "රු. 450,000"],
+    "local_job": ["Rs. 5,000 per day", "Rs. 150,000 per month", "Rs. 8,000 daily", "Rs. 250,000 monthly",
+                  "Rs 5k per day", "1.5 lakhs per month", "රු. 8,000 daily"],
     "student_visa": ["full scholarship", "100% scholarship", "free tuition", "Rs. 400,000 part-time income"],
     "visa_pr": ["USD 5,000 monthly", "CAD 6,000 per month", "AUD 7,500 monthly"],
 }
 LEGIT_SALARY = {
-    "foreign_job": ["QAR 1,400", "KWD 120", "AED 1,500", "SAR 1,500", "USD 1,100", "JPY 180,000", "EUR 900"],
-    "local_job": ["Rs. 55,000 + EPF/ETF", "Rs. 70,000 + EPF/ETF", "Rs. 48,000 + allowances", "Rs. 85,000 negotiable"],
+    "foreign_job": ["QAR 1,400", "KWD 120", "AED 1,500", "SAR 1,500", "USD 1,100", "JPY 180,000", "EUR 900",
+                    "Rs. 1.2 lakhs", "Rs 120k", "රු. 120,000"],
+    "local_job": ["Rs. 55,000 + EPF/ETF", "Rs. 70,000 + EPF/ETF", "Rs. 48,000 + allowances", "Rs. 85,000 negotiable",
+                  "Rs 65k + EPF/ETF", "රු. 60,000 + EPF/ETF", "0.75 lakhs + EPF"],
     "student_visa": ["partial merit scholarship", "25% tuition waiver for eligible students", "standard tuition fees"],
     "visa_pr": ["as per official points table", "subject to official assessment", "as per immigration rules"],
 }
-SCAM_FEE = ["Rs. 150,000", "Rs. 75,000", "Rs. 250,000", "Rs. 45,000", "Rs. 350,000", "Rs. 25,000", "USD 800"]
+SCAM_FEE = ["Rs. 150,000", "Rs. 75,000", "Rs. 250,000", "Rs. 45,000", "Rs. 350,000", "Rs. 25,000", "USD 800",
+            "Rs 150k", "1.5 lakhs", "රු. 75,000", "LKR 95,000", "2 lakhs"]
 LEGIT_FEE = ["the official SLBFE registration fee", "fees as published by the university",
              "the government visa fee only", "the official application fee"]
 AGENCY = ["Lanka Bright Overseas (Pvt) Ltd", "Ceylon Horizon Manpower", "Blue Lotus Foreign Employment",
@@ -78,7 +83,7 @@ DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 # ---------------------------------------------------------------- phrase pools
 # Pool layout: POOLS[lang][kind][key] -> list of templates. kind in open|offer|scam|legit|neutral|close.
-# For pools with >= 4 phrases, every 4th phrase (index % 4 == 3) is reserved for the held-out test split.
+# For pools with >= 3 phrases, every 3rd phrase (index % 3 == 2) is reserved for the held-out test split.
 POOLS = {
     "en": {
         "open": {
@@ -346,6 +351,141 @@ TAMIL = {
     "contact": ["தொடர்புக்கு 07X XXX XXXX.", "மேலதிக விபரங்களுக்கு அழைக்கவும் 07X XXX XXXX.",
                 "எமது அலுவலகத்திற்கு வரவும்."],
 }
+
+# ---------------------------------------------------------------- hard examples
+# Hard negatives: legit ads that look suspicious (fees, WhatsApp, deadlines, deposits), so the model can't just
+# learn "mentions a fee / WhatsApp / a deadline = scam". Merged into POOLS[lang]["legit"] and TAMIL["legit"].
+HARD_NEGATIVES = {
+    "en": {
+        "any": ["Shortlisted candidates will be contacted on WhatsApp to schedule the interview.",
+                "Applications close on 30 November. Late applications will not be accepted.",
+                "Urgent vacancies: interviews will be held this week at our office.",
+                "Interview dates are shared on WhatsApp 07X XXX XXXX after we review your CV.",
+                "Limited places this intake, so apply before the closing date.",
+                "Please bring a copy of your NIC and passport to the interview for verification."],
+        "foreign_job": ["{agency} (SLBFE licence {lic}): the only payment is the SLBFE registration fee of Rs. 22,027, "
+                        "paid at the SLBFE office with an official receipt.",
+                        "Medical tests are booked at an SLBFE-approved centre and paid there, with a receipt."],
+        "student_visa": ["The tuition deposit is paid only through the university's official online portal.",
+                         "Seat deposit of {legit_fee} is paid directly to the university, never to an agent."],
+        "visa_pr": ["Government visa fees are paid to the immigration department through its official website.",
+                    "Our registered adviser charges a published consultation fee; the visa decision is the embassy's."],
+        "local_job": ["Government vacancy as per the Gazette notice. An examination fee of Rs. 1,000 is payable to "
+                      "the Department.",
+                      "Part-time weekend role. Interview at our {country} office before selection."],
+    },
+    "singlish": {
+        "any": ["Interview time eka WhatsApp walin kiyanawa.",
+                "Applications close wenne November 30.",
+                "Ikmanata apply karanna, interview me sathiye office eke.",
+                "Interview ekata NIC eka passport eka copy ekak aran enna.",
+                "CV eka balala WhatsApp karanawa 07X XXX XXXX."],
+        "foreign_job": ["SLBFE registration fee Rs. 22,027 SLBFE office ekata gewanna, receipt ekak denawa.",
+                        "Medical eka SLBFE approve karapu centre ekaka, salli ethanata gewanna."],
+        "student_visa": ["University deposit eka official portal eken witharai gewanne."],
+        "visa_pr": ["Visa fee eka immigration department ekata official website eken gewanna."],
+        "local_job": ["Gazette eke thiyena vidihata exam fee Rs. 1,000 department ekata gewanna.",
+                      "Part time job, interview ekak thiyenawa office eke."],
+    },
+    "si": {
+        "any": ["සම්මුඛ පරීක්ෂණ වේලාව WhatsApp හරහා දැනුම් දෙනු ලැබේ.",
+                "අයදුම්පත් භාරගැනීම නොවැම්බර් 30 දිනෙන් අවසන් වේ.",
+                "හදිසි පුරප්පාඩු: මෙම සතියේ අපගේ කාර්යාලයේදී සම්මුඛ පරීක්ෂණ.",
+                "සම්මුඛ පරීක්ෂණයට ජාතික හැඳුනුම්පතේ සහ ගමන් බලපත්‍රයේ පිටපතක් රැගෙන එන්න.",
+                "ඔබේ CV එක පරීක්ෂා කළ පසු WhatsApp 07X XXX XXXX හරහා අමතනු ලැබේ."],
+        "foreign_job": ["SLBFE ලියාපදිංචි ගාස්තුව රු. 22,027 SLBFE කාර්යාලයේදී පමණක් ගෙවිය යුතුය, රිසිට්පතක් ලැබේ.",
+                        "වෛද්‍ය පරීක්ෂණය SLBFE අනුමත මධ්‍යස්ථානයක, ගාස්තුව එහිදීම ගෙවිය යුතුය."],
+        "student_visa": ["විශ්වවිද්‍යාල තැන්පතුව නිල වෙබ් ද්වාරය හරහා පමණක් ගෙවන්න."],
+        "visa_pr": ["වීසා ගාස්තුව ආගමන දෙපාර්තමේන්තුවට නිල වෙබ් අඩවිය හරහා ගෙවිය යුතුය."],
+        "local_job": ["ගැසට් නිවේදනය අනුව විභාග ගාස්තුව රු. 1,000 දෙපාර්තමේන්තුවට ගෙවිය යුතුය.",
+                      "අර්ධ කාලීන රැකියාව, ආයතනයේදී සම්මුඛ පරීක්ෂණයක් ඇත."],
+    },
+}
+TAMIL["legit"] += [
+    "நேர்முகத் தேர்வு நேரம் WhatsApp மூலம் அறிவிக்கப்படும்.",
+    "விண்ணப்பங்கள் நவம்பர் 30 உடன் முடிவடையும்.",
+    "வர்த்தமானி அறிவிப்பின்படி பரீட்சை கட்டணம் ரூ. 1,000 திணைக்களத்திற்கு செலுத்த வேண்டும்.",
+    "பல்கலைக்கழக வைப்புத்தொகை உத்தியோகபூர்வ இணையதளம் மூலம் மட்டுமே செலுத்தப்படும்.",
+    "பகுதி நேர வேலை, அலுவலகத்தில் நேர்முகத் தேர்வு உண்டு.",
+    "SLBFE பதிவு கட்டணம் ரூ. 22,027 SLBFE அலுவலகத்தில் மட்டுமே செலுத்தப்படும்.",
+]
+
+
+def _merge_hard(table: dict, label: str) -> None:
+    for lang, groups in table.items():
+        for key, lines in groups.items():
+            POOLS[lang][label].setdefault(key, []).extend(lines)
+
+
+_merge_hard(HARD_NEGATIVES, "legit")
+
+# Hard positives: scams without the usual trigger words. Polite, professional tone; fees disguised as document
+# verification, medical booking or embassy appointments; "high success rate" instead of "guaranteed".
+HARD_POSITIVES = {
+    "en": {
+        "any": ["We kindly request a refundable document verification charge of {fee} to open your file.",
+                "Please book your medical through our partner centre; the medical booking fee is {fee}.",
+                "An embassy appointment slot costs {fee}, payable to our coordinator.",
+                "For registration, kindly send a clear copy of your NIC and passport to our officer.",
+                "Our agency has a very high visa success rate with past candidates.",
+                "Your offer letter will be released once the file opening charge is settled.",
+                "Our coordinator will personally guide you through every step of the process."],
+        "student_visa": ["Apply through us for a high visa success rate; the seat confirmation fee of {fee} is paid "
+                         "to our office."],
+        "visa_pr": ["We handle your PR file end to end; the assessment processing charge is {fee}."],
+        "local_job": ["Paid product review internship: review items online and receive weekly payments after a "
+                      "small starter deposit.",
+                      "Remote product review internship for students, earn {salary}, onboarding package {fee}."],
+    },
+    "singlish": {
+        "any": ["Document verification charge eka {fee} witharai, passe refund karanawa.",
+                "Medical booking eka api karanawa, {fee} gewanna.",
+                "Embassy appointment ekata {fee} coordinator ta denna.",
+                "Registration walata NIC eka passport eka copy ekak yawanna.",
+                "Api agency eke visa success rate eka godak high.",
+                "File eka open karanna charge eka gewwama offer letter eka denawa."],
+        "local_job": ["Product review internship ekak, gedara idan, starter deposit ekak witharai."],
+    },
+    "si": {
+        "any": ["ලේඛන සත්‍යාපන ගාස්තුව {fee} පමණි, පසුව ආපසු ලබා දෙනු ලැබේ.",
+                "වෛද්‍ය පරීක්ෂණය අප හරහා වෙන් කරන්න, ගාස්තුව {fee}.",
+                "තානාපති කාර්යාල හමුව සඳහා {fee} අපගේ නිලධාරියාට ගෙවන්න.",
+                "ලියාපදිංචිය සඳහා ජාතික හැඳුනුම්පත සහ ගමන් බලපත්‍රයේ පිටපතක් එවන්න.",
+                "අපගේ වීසා සාර්ථකත්ව අනුපාතය ඉතා ඉහළයි.",
+                "ගොනුව විවෘත කිරීමේ ගාස්තුව ගෙවූ පසු පත්වීම් ලිපිය ලබා දෙනු ලැබේ."],
+        "local_job": ["නිෂ්පාදන සමාලෝචන අභ්‍යාසලාභී තනතුරු, ආරම්භක තැන්පතුවක් පමණි."],
+    },
+}
+TAMIL["scam"] += [
+    "ஆவண சரிபார்ப்பு கட்டணம் {fee} மட்டுமே, பின்னர் திருப்பித் தரப்படும்.",
+    "மருத்துவ பரிசோதனை முன்பதிவுக்கு {fee} எம்மிடம் செலுத்தவும்.",
+    "தூதரக சந்திப்புக்கு {fee} எமது ஒருங்கிணைப்பாளரிடம் செலுத்தவும்.",
+    "பதிவுக்கு தேசிய அடையாள அட்டை மற்றும் கடவுச்சீட்டு நகலை அனுப்பவும்.",
+    "எமது விசா வெற்றி விகிதம் மிக அதிகம்.",
+    "தயாரிப்பு மதிப்பாய்வு பயிற்சி வேலை, ஆரம்ப வைப்புத்தொகை மட்டும்.",
+]
+_merge_hard(HARD_POSITIVES, "scam")
+
+# Shared sign-offs and openers, used by both classes at the same rate, so licence numbers, agency names, WhatsApp
+# and placeholder phones stop being label shortcuts (scams quote borrowed licences too).
+SIGNOFF = {
+    "en": POOLS["en"]["contact"] + POOLS["en"]["close"]["legit"] + [
+        "{agency} (SLBFE licence {lic}). WhatsApp 07X XXX XXXX.",
+        "Licence no. {lic} | {agency} | 07X XXX XXXX",
+        "{agency}, licensed by SLBFE ({lic}). Call 011 XXX XXXX or WhatsApp 07X XXX XXXX."],
+    "singlish": POOLS["singlish"]["contact"] + POOLS["singlish"]["close"]["legit"] + [
+        "{agency} | licence {lic} | WhatsApp 07X XXX XXXX",
+        "SLBFE licence {lic}, {agency}. Call 07X XXX XXXX."],
+    "si": POOLS["si"]["contact"] + POOLS["si"]["close"]["legit"] + [
+        "{agency} | බලපත්‍ර අංක {lic} | WhatsApp 07X XXX XXXX",
+        "SLBFE බලපත්‍ර {lic}, {agency}. අමතන්න 07X XXX XXXX."],
+}
+SHARED_OPEN = {
+    "en": ["Dear candidate,", "Greetings from our recruitment team.", "Dear applicants,", "Good news for job seekers."],
+    "singlish": ["Ayubowan!", "Dear candidates,", "Hello hamotama,"],
+    "si": ["ආයුබෝවන්!", "හිතවත් අයදුම්කරුවනි,", "රැකියා අපේක්ෂකයින්ට සුබ ආරංචියක්."],
+}
+
 NEW_TACTICS = {  # tactic -> (category, scam lines)
     "crypto_payment": ("foreign_job", [
         "Pay the processing fee in USDT (TRC20) to the wallet address below for faster visa processing.",
@@ -376,10 +516,10 @@ NEW_DESTINATIONS = {"foreign_job": ["Thailand", "Russia", "Belarus", "Georgia", 
 
 
 def _split_pool(items: list[str], split: str, rng: random.Random) -> list[str]:
-    if len(items) < 4:
+    if len(items) < 3:
         return items
-    reserved = [x for i, x in enumerate(items) if i % 4 == 3]
-    common = [x for i, x in enumerate(items) if i % 4 != 3]
+    reserved = [x for i, x in enumerate(items) if i % 3 == 2]
+    common = [x for i, x in enumerate(items) if i % 3 != 2]
     if split == "train":
         return common
     return reserved if rng.random() < 0.5 else common
@@ -422,7 +562,10 @@ def compose(rng: random.Random, lang: str, label: str, cat: str, split: str) -> 
     P = POOLS[lang]
     pick = lambda items: rng.choice(_split_pool(items, split, rng))  # noqa: E731
     parts = []
-    if rng.random() < 0.8:
+    r = rng.random()
+    if r < 0.3:
+        parts.append(pick(SHARED_OPEN[lang]))
+    elif r < 0.8:
         parts.append(pick(P["open"][label]))
     parts.append(pick(P["offer"][cat]))
     generic = P[label]["any"]
@@ -431,13 +574,18 @@ def compose(rng: random.Random, lang: str, label: str, cat: str, split: str) -> 
     pool = _split_pool(P[label][cat] + generic, split, rng)
     k = rng.randint(1, 3) if label == "scam" else rng.randint(2, 3)
     parts += rng.sample(pool, min(k, len(pool)))
-    # Hard examples: scams that borrow legit wording, legit ads with "risky-looking" but harmless lines.
-    if label == "scam" and rng.random() < 0.4:
-        parts.insert(2, pick(P["legit"]["any"][:3]))
-    if rng.random() < (0.5 if label == "legit" else 0.35):
+    # Hard examples: most scams copy one or two lines of legit wording (deadlines, interview scheduling, document
+    # checks), so no single phrase gives the class away; legit ads carry "risky-looking" but harmless lines.
+    if label == "scam" and rng.random() < 0.6:
+        borrowed = _split_pool(P["legit"]["any"], split, rng)
+        for line in rng.sample(borrowed, rng.randint(1, 2)):
+            parts.insert(rng.randint(2, len(parts)), line)
+    if rng.random() < 0.45:  # same rate for both classes, so WhatsApp / phone lines stay balanced
         parts.append(pick(P["neutral"]))
-    # Contact lines are mostly shared so the sign-off cannot give the label away.
-    parts.append(pick(P["contact"]) if rng.random() < 0.6 else pick(P["close"][label]))
+    # Scam-only closes are urgency tactics (a real signal); the sign-off itself is shared by both classes.
+    if label == "scam" and rng.random() < 0.25:
+        parts.append(pick(P["close"]["scam"]))
+    parts.append(pick(SIGNOFF[lang]))
     return _render(parts, rng, cat, label)
 
 
