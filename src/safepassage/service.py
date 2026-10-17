@@ -20,6 +20,13 @@ def model_loaded() -> bool:
     return _model is not None
 
 
+def reload_model() -> bool:
+    """Pick up a freshly trained model without restarting the service."""
+    global _model
+    _model = ScamModel() if MODEL_PATH.exists() else None
+    return model_loaded()
+
+
 def scan_text(text: str, source: str = "text", url: str | None = None) -> ScanResult:
     flags = find_red_flags(text)
     # Until Person A ships a model, fall back to a crude red-flag score so the pipeline runs end to end.

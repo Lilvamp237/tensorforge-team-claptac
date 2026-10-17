@@ -9,8 +9,9 @@ from . import __version__, reputation
 from .drift import drift_report
 from .fetch import UnsafeURL
 from .monitoring import pending_reviews, read_alerts
+from .response import trigger_retrain
 from .schema import ScanResult
-from .service import model_loaded, scan_file, scan_public_url, scan_text
+from .service import model_loaded, reload_model, scan_file, scan_public_url, scan_text
 
 app = FastAPI(title="SafePassage LK", version=__version__)
 
@@ -84,6 +85,16 @@ def report_site(body: UserReport):
 @app.get("/api/v1/reputation")
 def reputation_lists():
     return reputation.lists()
+
+
+@app.post("/api/v1/retrain")
+def retrain():
+    return trigger_retrain()
+
+
+@app.post("/api/v1/model/reload")
+def model_reload():
+    return {"model_loaded": reload_model()}
 
 
 @app.get("/api/v1/alerts")
