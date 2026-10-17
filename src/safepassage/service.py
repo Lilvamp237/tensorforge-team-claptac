@@ -2,6 +2,7 @@
 
 import uuid
 
+from . import reputation
 from .config import MODEL_PATH, NOVELTY_THRESHOLD
 from .extract import extract_content
 from .features import describe, find_red_flags
@@ -19,10 +20,19 @@ def model_loaded() -> bool:
     return _model is not None
 
 
-def scan_text(text: str, source: str = "text") -> ScanResult:
+def scan_text(text: str, source: str = "text", url: str | None = None) -> ScanResult:
     flags = find_red_flags(text)
     # Until Person A ships a model, fall back to a crude red-flag score so the pipeline runs end to end.
     p = _model.score(text) if _model else min(1.0, 0.2 + 0.15 * len(flags))
+    indicators = describe(flags)
+
+    listing = reputation.status(url) if url else None
+    if listing == "blocklisted":
+        p = max(p, 0.9)
+        indicators.insert(0, "Website is on the SafePassage blocklist (analyst-confirmed reports)")
+    elif listing == "allowlisted":
+        # Informational only: scammers copy trusted sites, so the model's score is not overridden.
+        indicators.insert(0, "Website is on the SafePassage verified list")
 
     content = extract_content(text)
     nov = novelty(text)
@@ -34,10 +44,11 @@ def scan_text(text: str, source: str = "text") -> ScanResult:
     result = ScanResult(
         scan_id=f"scan_{uuid.uuid4().hex[:8]}",
         source=source,
+        url=url,
         risk=Risk(label=label, probability=round(p, 4)),
         needs_review=needs_review,
         content=content,
-        indicators=describe(flags),
+        indicators=indicators,
         verification=verify(text, content),
         novelty=nov,
         campaign=campaign(text),
@@ -54,7 +65,7 @@ def scan_public_url(url: str) -> ScanResult:
     from .fetch import extract_text, safe_fetch
 
     body, content_type = safe_fetch(url)
-    return scan_text(extract_text(body, content_type), source="url")
+    return scan_text(extract_text(body, content_type), source="url", url=url)
 
 
 def scan_file(data: bytes, filename: str) -> ScanResult:

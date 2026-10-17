@@ -30,6 +30,9 @@ NOVELTY_THRESHOLD = 0.6
 DRIFT_MIN_SCANS = 20
 ALERT_WEBHOOK_URL = os.environ.get("ALERT_WEBHOOK_URL")
 
+# Community reports: this many scam reports on one site puts it in the analyst queue (never auto-listed).
+REPORT_THRESHOLD = 3
+
 # Limits for fetching user-submitted URLs.
 FETCH_TIMEOUT_S = 10
 FETCH_MAX_BYTES = 2_000_000
