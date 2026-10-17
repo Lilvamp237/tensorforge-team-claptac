@@ -18,6 +18,7 @@ RUN python -c "from faster_whisper import WhisperModel; WhisperModel('small', de
 
 COPY src/ src/
 COPY app/ app/
+COPY .streamlit/ .streamlit/
 COPY scripts/ scripts/
 COPY data/kb/ data/kb/
 COPY data/synthetic/ data/synthetic/

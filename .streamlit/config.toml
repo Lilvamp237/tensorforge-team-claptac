@@ -1,2 +1,13 @@
 [server]
 maxUploadSize = 10  # MB, same cap as the REST API for voice notes and screenshots
+
+[theme]
+base = "light"
+primaryColor = "#0B3B60"
+backgroundColor = "#F6F8FB"
+secondaryBackgroundColor = "#EEF2F6"
+textColor = "#101828"
+font = "sans serif"
+
+[client]
+toolbarMode = "minimal"
