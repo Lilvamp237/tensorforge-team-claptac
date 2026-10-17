@@ -54,7 +54,7 @@ def scan_text(text: str, source: str = "text", url: str | None = None, media: st
 
     content = extract_content(text)
     verification = verify(text, content)
-    combined = stacker.score(p, flags, verification) if _model else None
+    combined = stacker.score(p, flags, verification) if _model and config.USE_STACKER else None
     if combined is not None:
         # The stacking meta-model combines the text score, red flags and official records into one probability.
         p = combined
