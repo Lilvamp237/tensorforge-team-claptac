@@ -574,10 +574,13 @@ def compose(rng: random.Random, lang: str, label: str, cat: str, split: str) -> 
     pool = _split_pool(P[label][cat] + generic, split, rng)
     k = rng.randint(1, 3) if label == "scam" else rng.randint(2, 3)
     parts += rng.sample(pool, min(k, len(pool)))
-    # Hard examples: scams that borrow legit wording, legit ads with "risky-looking" but harmless lines.
-    if label == "scam" and rng.random() < 0.4:
-        parts.insert(2, pick(P["legit"]["any"][:3]))
-    if rng.random() < (0.5 if label == "legit" else 0.35):
+    # Hard examples: most scams copy one or two lines of legit wording (deadlines, interview scheduling, document
+    # checks), so no single phrase gives the class away; legit ads carry "risky-looking" but harmless lines.
+    if label == "scam" and rng.random() < 0.6:
+        borrowed = _split_pool(P["legit"]["any"], split, rng)
+        for line in rng.sample(borrowed, rng.randint(1, 2)):
+            parts.insert(rng.randint(2, len(parts)), line)
+    if rng.random() < 0.45:  # same rate for both classes, so WhatsApp / phone lines stay balanced
         parts.append(pick(P["neutral"]))
     # Scam-only closes are urgency tactics (a real signal); the sign-off itself is shared by both classes.
     if label == "scam" and rng.random() < 0.25:
