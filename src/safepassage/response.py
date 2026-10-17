@@ -7,23 +7,23 @@ import sys
 
 from . import config
 from .drift import drift_report
-from .monitoring import raise_alert, reviewed
+from .monitoring import raise_alert, read_alerts, reviewed
 
-_drifting = False
+_DRIFT_KINDS = ("drift_detected", "drift_cleared")
 
 
 def drift_active() -> bool:
-    return _drifting
+    """Drift state lives in the alert log, so the API, Streamlit and scripts (separate processes) agree on it."""
+    last = next((a["kind"] for a in reversed(read_alerts()) if a["kind"] in _DRIFT_KINDS), None)
+    return last == "drift_detected"
 
 
 def check_drift() -> dict:
     """Recompute drift; alert only when the state changes so the log isn't flooded."""
-    global _drifting
     report = drift_report()
     now = report["n"] >= config.DRIFT_MIN_SCANS and report["drift"]
-    if now != _drifting:
+    if now != drift_active():
         raise_alert("drift_detected" if now else "drift_cleared", report)
-        _drifting = now
     return {**report, "drift": now}
 
 
@@ -48,8 +48,3 @@ def trigger_retrain() -> dict:
                             cwd=config.ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
     raise_alert("retrain_started", {"pid": proc.pid, "feedback_rows": n})
     return {"started": True, "pid": proc.pid, "feedback_rows": n}
-
-
-def reset() -> None:
-    global _drifting
-    _drifting = False
