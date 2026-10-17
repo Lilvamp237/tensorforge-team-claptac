@@ -34,3 +34,19 @@ def test_drifting_routes_high_risk_to_review():
     high = scan_text("Guaranteed visa! Pay processing fee now, only 2 seats left, WhatsApp, no interview needed.")
     assert high.risk.label == "high"
     assert high.needs_review
+
+
+def test_drift_alert_does_not_flap_just_under_threshold(monkeypatch):
+    from safepassage import response
+    thresholds = {"language_psi": 1.0}
+    reports = iter([
+        {"n": 50, "drift": True, "signals": {"language_psi": 1.2}, "thresholds": thresholds, "triggered": ["language_psi"]},
+        {"n": 50, "drift": False, "signals": {"language_psi": 0.95}, "thresholds": thresholds, "triggered": []},
+        {"n": 50, "drift": False, "signals": {"language_psi": 0.5}, "thresholds": thresholds, "triggered": []},
+    ])
+    monkeypatch.setattr(response, "drift_report", lambda: next(reports))
+    assert response.check_drift()["drift"] is True
+    assert response.check_drift()["drift"] is True   # 0.95 is under the threshold but above 80% of it: still drifting
+    assert response.check_drift()["drift"] is False  # clearly back to normal
+    kinds = [a["kind"] for a in response.read_alerts()]
+    assert kinds == ["drift_detected", "drift_cleared"]
