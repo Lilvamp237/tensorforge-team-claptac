@@ -1,4 +1,4 @@
-# docker compose up --build
+# docker compose up --build                  (add --profile jobs for the retrain scheduler and ikman collector)
 #   API        http://localhost:8000/docs
 #   Web app    http://localhost:8501
 #   MCP        http://localhost:8001/mcp  (published on localhost only)
@@ -43,6 +43,28 @@ services:
       - "127.0.0.1:8001:8001"
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8001), 2)"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Opt-in background jobs: docker compose --profile jobs up --build
+  scheduler:
+    <<: *app
+    profiles: ["jobs"]
+    command: ["python", "-m", "safepassage.scheduler", "--interval-min", "60", "--min-new-labels", "20"]
+    healthcheck:
+      disable: true  # the image's healthcheck probes the API, which this container doesn't run
+    depends_on:
+      api:
+        condition: service_healthy
+
+  collector:
+    <<: *app
+    profiles: ["jobs"]
+    restart: "no"  # one polite pass over public ikman listings, then exit; re-run with: docker compose run collector
+    command: ["python", "scripts/collect_ikman.py", "--once", "--api", "http://api:8000"]
+    healthcheck:
+      disable: true
     depends_on:
       api:
         condition: service_healthy
