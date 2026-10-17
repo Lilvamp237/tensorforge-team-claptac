@@ -1,5 +1,5 @@
 # One image for all three services; docker-compose.yml picks the command (API, Streamlit UI or MCP server).
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 ENV PYTHONPATH=/app/src \
