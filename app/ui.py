@@ -28,7 +28,8 @@ html, body, [class*="css"], .stApp { font-family: "Inter", "Segoe UI", system-ui
 .stApp { background: var(--canvas); }
 .block-container { padding-top: 1.2rem; padding-bottom: 3rem; max-width: 1280px; }
 header[data-testid="stHeader"] { background: transparent; }
-#MainMenu, footer, [data-testid="stToolbar"] { visibility: hidden; }
+/* Keep Streamlit's toolbar visible: it contains the control to reopen a collapsed sidebar. */
+#MainMenu, footer { visibility: hidden; }
 
 /* tabs */
 .stTabs [data-baseweb="tab-list"] { gap: 4px; border-bottom: 1px solid var(--line); }
