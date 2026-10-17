@@ -52,7 +52,8 @@ def use_example(name: str) -> None:
 # ---------------------------------------------------------------- sidebar
 drift_now = check_drift()
 with st.sidebar:
-    ui.html('<div style="font-size:1.25rem;font-weight:800;margin:4px 0 14px">🛡️ SafePassage LK</div>')
+    ui.html(f'<div style="display:flex;align-items:center;gap:8px;font-size:1.2rem;font-weight:800;margin:4px 0 14px">'
+            f'{ui.SHIELD} SafePassage LK</div>')
     ui.html('<div class="sp-side-card"><div class="sp-side-muted">SLBFE 24-hour hotline</div>'
             '<div class="big">1989</div><div class="sp-side-muted">Check any agency or fee before you pay.</div></div>')
     ui.html("""<div class="sp-side-card"><b>How it works</b><ol class="sp-steps" style="margin-top:8px">
@@ -68,9 +69,11 @@ with st.sidebar:
 
 agencies, orders = official_counts()
 ui.hero([("SLBFE agencies on record", f"{agencies:,}"), ("Approved job orders", f"{orders:,}"),
-         ("Input types", "Text · Link · Image · Voice")])
+         ("Languages", "EN · SI · TA")])
 
-scan_tab, dash_tab, analyst_tab = st.tabs(["🔍  Check an offer", "📈  Monitoring", "🧑‍💼  Analyst console"])
+scan_tab, agency_tab, dash_tab, analyst_tab = st.tabs([":material/search: Check an offer", ":material/apartment: Agency lookup",
+                                                      ":material/monitoring: Monitoring",
+                                                      ":material/admin_panel_settings: Analyst console"])
 
 # ---------------------------------------------------------------- check an offer
 with scan_tab:
@@ -146,11 +149,12 @@ with scan_tab:
         if not result:
             with st.container(border=True):
                 ui.section("Result")
-                ui.html('<div style="padding:28px 6px;color:#667085"><div style="font-size:2.2rem">🛡️</div>'
-                        '<div style="font-size:1.05rem;font-weight:650;color:#101828;margin:6px 0">'
-                        'Check before you pay</div>Paste an offer, share a link, or upload a screenshot or voice '
-                        'note. You will get a risk score, the warning signs we found, and what official SLBFE '
-                        'records say about the agency and the fee.</div>')
+                ui.html('<div style="padding:10px 2px 0;color:#667085"><div style="font-size:1.1rem;font-weight:700;'
+                        'color:#101828;margin-bottom:4px">Check before you pay</div>Paste an offer, share a link, or '
+                        'upload a screenshot or voice note.</div>')
+                ui.tiles([("1", "Risk score", "A trained model scores the offer in English, Sinhala, Tamil or Singlish."),
+                          ("2", "Warning signs", "Plain-language red flags: advance fees, guarantees, personal accounts."),
+                          ("3", "Official records", "Agency licence and fee checked against SLBFE's public records.")])
         else:
             with st.container(border=True):
                 ui.section("Result")
@@ -160,7 +164,8 @@ with scan_tab:
                          c.claimed_agency, LANGUAGES.get(c.language)]
                 ui.chips([f for f in facts if f], brand=True)
                 if result.needs_review:
-                    ui.html('<div class="sp-chip" style="margin-bottom:10px">👤 An analyst will double-check this one</div>')
+                    ui.html('<div class="sp-chip" style="margin-bottom:10px">An analyst will double-check this one</div>')
+                ui.next_steps(result.risk.label)
                 extracted = st.session_state.get("extracted")
                 if extracted:
                     ui.section(extracted[0])
@@ -179,6 +184,59 @@ with scan_tab:
                 ui.item_list(rows, "")
             with st.expander("Technical details (JSON)"):
                 st.json(result.model_dump())
+
+
+# ---------------------------------------------------------------- agency lookup (scraped SLBFE data)
+@st.cache_data
+def registry() -> tuple[pd.DataFrame, pd.DataFrame]:
+    reg = pd.read_csv(config.KB_DIR / "slbfe_registry.csv", dtype=str).fillna("")
+    orders = pd.read_csv(config.KB_DIR / "slbfe_job_orders.csv", dtype=str).fillna("")
+    return reg, orders
+
+
+with agency_tab:
+    reg, orders = registry()
+    left, right = st.columns([5, 7], gap="large")
+    with left, st.container(border=True):
+        ui.section("Look up an agency")
+        query = st.text_input("Agency name or SLBFE licence number", placeholder="e.g. 2963 or Katari",
+                              label_visibility="collapsed")
+        counts = reg["status"].value_counts()
+        st.caption(f"{len(reg):,} agencies scraped from SLBFE's public lists: {counts.get('licensed', 0):,} licensed, "
+                   f"{counts.get('suspended', 0):,} suspended, {counts.get('cancelled', 0):,} cancelled. "
+                   f"{len(orders):,} approved job orders from the SLBFE job bank, with the maximum fee each allows.")
+    with right:
+        q = (query or "").strip()
+        if not q:
+            with st.container(border=True):
+                ui.section("Why this matters")
+                st.markdown("Scammers quote real-looking licence numbers, or a licence that was **cancelled**. "
+                            "Every scan is checked against these records automatically; here you can look an agency "
+                            "up yourself before you pay.")
+        else:
+            digits = q.lstrip("0")
+            hits = reg[reg["licence_no"].str.lstrip("0") == digits] if q.isdigit() else                 reg[reg["name"].str.contains(q, case=False, regex=False)]
+            if hits.empty:
+                with st.container(border=True):
+                    ui.banner(False, "Not found in SLBFE records",
+                              "No agency matches. A real foreign-employment agency must hold an SLBFE licence. "
+                              "Call 1989 before paying anyone.")
+            for _, a in hits.head(5).iterrows():
+                mine = orders[orders["licence_no"].str.lstrip("0") == a["licence_no"].lstrip("0")]
+                with st.container(border=True):
+                    ui.agency_card(a["name"], a["licence_no"], a["status"], a["source"], a["retrieved"], len(mine))
+                    if len(mine):
+                        view = mine.copy()
+                        view["max_fee_lkr"] = pd.to_numeric(view["max_fee_lkr"], errors="coerce")
+                        view = view.sort_values("valid_until", ascending=False).head(50)
+                        st.dataframe(view[["country", "job_title", "vacancies_approved", "max_fee_lkr", "valid_until"]],
+                                     hide_index=True, use_container_width=True, height=min(38 + 35 * len(view), 280),
+                                     column_config={
+                                         "country": "Country", "job_title": "Job", "vacancies_approved": "Vacancies",
+                                         "max_fee_lkr": st.column_config.NumberColumn("Max fee (Rs.)", format="%,d"),
+                                         "valid_until": "Valid until"})
+            if len(hits) > 5:
+                st.caption(f"{len(hits)} matches; showing the first 5. Type more of the name to narrow it down.")
 
 # ---------------------------------------------------------------- monitoring
 with dash_tab:
@@ -321,3 +379,5 @@ with analyst_tab:
                     st.dataframe(pd.DataFrame(entries), hide_index=True, use_container_width=True)
                 else:
                     st.caption("Empty. Sites are listed only by an analyst decision.")
+
+ui.footer()

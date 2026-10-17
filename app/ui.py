@@ -15,6 +15,14 @@ RISK = {
     "low": {"label": "Low risk", "fg": "#067647", "bg": "#ECFDF3", "border": "#ABEFC6",
             "advice": "No strong warning signs found. Still, pay only official fees and always get a receipt."},
 }
+SHIELD = ('<svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">'
+          '<path d="M12 2.5 4.5 5.5v5.6c0 4.6 3.1 8.8 7.5 10.4 4.4-1.6 7.5-5.8 7.5-10.4V5.5L12 2.5Z" '
+          'fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>'
+          '<path d="m8.6 12.2 2.4 2.4 4.6-4.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" '
+          'stroke-linejoin="round"/></svg>')
+LICENCE = {"licensed": ("Licensed", "#067647", "#ECFDF3"), "suspended": ("Suspended", "#B54708", "#FFFAEB"),
+           "cancelled": ("Cancelled", "#B42318", "#FEF3F2")}
+
 STATUS_ICON = {"consistent": ("✓", "#067647", "#ECFDF3"), "contradicted": ("✕", "#B42318", "#FEF3F2"),
                "unverifiable": ("?", "#475467", "#F2F4F7")}
 
@@ -55,7 +63,7 @@ header[data-testid="stHeader"] { background: transparent; }
 .sp-hero p { color: #D6E6F2; margin: 4px 0 0; font-size: .98rem; }
 .sp-brand { display: flex; align-items: center; gap: 14px; }
 .sp-logo { width: 46px; height: 46px; border-radius: 12px; background: rgba(255,255,255,.14);
-  display: grid; place-items: center; font-size: 26px; }
+  display: grid; place-items: center; color: #fff; }
 .sp-hero-stats { display: flex; gap: 10px; flex-wrap: wrap; }
 .sp-hero-stat { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); border-radius: 12px;
   padding: 8px 14px; min-width: 110px; }
@@ -113,6 +121,21 @@ header[data-testid="stHeader"] { background: transparent; }
 .sp-side-card .big { font-size: 1.6rem; font-weight: 800; color: #fff; }
 .sp-steps { padding-left: 18px; margin: 0; }
 .sp-steps li { margin-bottom: 6px; font-size: .88rem; }
+.sp-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.sp-tile { background: #F9FAFB; border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.sp-tile b { display: block; color: var(--ink); font-size: .9rem; margin-bottom: 3px; }
+.sp-tile span { color: var(--faint); font-size: .8rem; line-height: 1.35; }
+.sp-tile i { font-style: normal; display: inline-grid; place-items: center; width: 28px; height: 28px;
+  border-radius: 8px; background: var(--brand-soft); color: var(--brand-2); font-weight: 800; margin-bottom: 8px; }
+.sp-next { background: #F9FAFB; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+.sp-next ol { margin: 6px 0 0; padding-left: 18px; }
+.sp-next li { color: #344054; font-size: .9rem; margin-bottom: 4px; }
+.sp-agency { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sp-agency-name { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.sp-agency-meta { color: var(--faint); font-size: .82rem; margin-top: 2px; }
+.sp-agency-meta a { color: var(--brand-2); }
+.sp-footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--faint);
+  font-size: .78rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 </style>
 """
 
@@ -131,7 +154,7 @@ def section(title: str) -> None:
 
 def hero(stats: list[tuple[str, str]]) -> None:
     cells = "".join(f'<div class="sp-hero-stat"><b>{escape(v)}</b><span>{escape(k)}</span></div>' for k, v in stats)
-    html(f"""<div class="sp-hero"><div class="sp-brand"><div class="sp-logo">🛡️</div><div>
+    html(f"""<div class="sp-hero"><div class="sp-brand"><div class="sp-logo">{SHIELD}</div><div>
 <h1>SafePassage LK</h1><p>Check a job, study or visa offer before you pay. English · සිංහල · தமிழ் · Singlish</p>
 </div></div><div class="sp-hero-stats">{cells}</div></div>""")
 
@@ -208,3 +231,40 @@ def quote(text: str) -> None:
 def pill(text: str, label: str) -> str:
     r = RISK.get(label, {"fg": "#344054", "bg": "#F2F4F7"})
     return f'<span class="sp-pill" style="color:{r["fg"]};background:{r["bg"]}">{escape(text)}</span>'
+
+
+def tiles(items: list[tuple[str, str, str]]) -> None:
+    html('<div class="sp-tiles">' + "".join(
+        f'<div class="sp-tile"><i>{escape(i)}</i><b>{escape(t)}</b><span>{escape(d)}</span></div>' for i, t, d in items)
+        + "</div>")
+
+
+def next_steps(label: str) -> None:
+    steps = {
+        "high": ["Do not pay anything and do not send your passport or NIC copies.",
+                 "Look the agency up in the Agency lookup tab, or call SLBFE on 1989.",
+                 "Report the website or number below so analysts can act."],
+        "medium": ["Ask for the SLBFE licence number and check it in the Agency lookup tab.",
+                   "Pay only official fees, in person, and always get a receipt.",
+                   "If anything feels rushed or secret, call SLBFE on 1989 before you continue."],
+    }.get(label)
+    if steps:
+        html('<div class="sp-next"><b>What to do next</b><ol>' + "".join(f"<li>{escape(x)}</li>" for x in steps)
+             + "</ol></div>")
+
+
+def licence_pill(status: str) -> str:
+    text, fg, bg = LICENCE.get(status, (status.capitalize(), "#344054", "#F2F4F7"))
+    return f'<span class="sp-pill" style="color:{fg};background:{bg}">{escape(text)}</span>'
+
+
+def agency_card(name: str, licence: str, status: str, source: str, retrieved: str, orders: int) -> None:
+    html(f'<div class="sp-agency"><div><div class="sp-agency-name">{escape(name)}</div>'
+         f'<div class="sp-agency-meta">Licence {escape(licence)} · {orders:,} approved job orders · '
+         f'<a href="{escape(source)}" target="_blank">SLBFE source</a> · retrieved {escape(retrieved)}</div></div>'
+         f'{licence_pill(status)}</div>')
+
+
+def footer() -> None:
+    html('<div class="sp-footer"><span>SafePassage LK · TensorForge 2.0 · Official data: SLBFE public registry and '
+         'job bank (17 Oct 2026)</span><span>A risk assessment, not a fraud determination.</span></div>')
