@@ -70,14 +70,14 @@ LEGIT_FEE = ["the official SLBFE registration fee", "fees as published by the un
 AGENCY = ["Lanka Bright Overseas (Pvt) Ltd", "Ceylon Horizon Manpower", "Blue Lotus Foreign Employment",
           "Serendib Global Careers", "Island Star Recruiters", "Kelani Gateway Agency", "Ruhunu Pathway Consultants",
           "Pearl Coast Education", "Sigiri Migration Services", "Dewdrop Study Abroad"]
-LIC = ["1023", "1187", "1542", "2051", "2316", "0987", "1764", "2290"]
+LIC = ["9023", "9187", "9542", "9051", "9316", "9987", "9764", "9290"]
 # Each agency's own licence number (the first six match data/kb/registry_demo.csv; Island Star is suspended there).
 # Legit ads quote their own agency's licence; scams may borrow a real-looking number.
-AGENCY_LICENCE = {"Lanka Bright Overseas (Pvt) Ltd": "1023", "Ceylon Horizon Manpower": "1187",
-                  "Blue Lotus Foreign Employment": "1542", "Serendib Global Careers": "2051",
-                  "Kelani Gateway Agency": "2316", "Island Star Recruiters": "0987",
-                  "Ruhunu Pathway Consultants": "3104", "Pearl Coast Education": "3220",
-                  "Sigiri Migration Services": "3377", "Dewdrop Study Abroad": "3412"}
+AGENCY_LICENCE = {"Lanka Bright Overseas (Pvt) Ltd": "9023", "Ceylon Horizon Manpower": "9187",
+                  "Blue Lotus Foreign Employment": "9542", "Serendib Global Careers": "9051",
+                  "Kelani Gateway Agency": "9316", "Island Star Recruiters": "9987",
+                  "Ruhunu Pathway Consultants": "9104", "Pearl Coast Education": "9220",
+                  "Sigiri Migration Services": "9377", "Dewdrop Study Abroad": "9412"}
 LEGIT_AGENCIES = [a for a in AGENCY if a != "Island Star Recruiters"]
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
