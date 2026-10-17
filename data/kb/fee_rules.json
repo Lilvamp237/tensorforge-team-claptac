@@ -11,9 +11,9 @@
     "source": "https://www.sundaytimes.lk/221127/news/human-trafficking-us-report-highlights-lankas-failures-503423.html"
   },
   "highest_published_cap_lkr": {
-    "value": 450000,
-    "note": "SLBFE publishes a maximum fee per vacancy. The highest published maximum we found is Rs. 450,000 (Romania, 2022); Japan technical jobs were capped at Rs. 350,000 (2021). Anything above this is above every cap on record.",
-    "source": "https://themorning.lk/foreign-job-seekers-charged-exorbitantly"
+    "value": 14557758,
+    "note": "Highest Maximum Amount Chargeable by Sri Lanka Agency among currently valid SLBFE-approved job orders in data/kb/slbfe_job_orders.csv (32,686 orders from 540 agencies, crawled 2026-10-17); the top order is Moldova hotel/kitchen staff, licence 2963. The verifier recomputes this from the CSV at run time and uses this value only if the CSV is missing. It replaces the earlier Rs. 450,000 figure (Romania, 2022), which current orders far exceed (e.g. Japan SSW Agriculture Rs. 1,119,985, approved 27 Nov 2025). Fees are checked against the matching job order first; this global cap is only the fallback.",
+    "source": "https://applications.slbfe.lk/jobbank/jsearchdisplay_an_m.asp?an=2963"
   },
   "professional_jobs": {
     "note": "Jobs in the SLBFE Professional manpower level. SLBFE reports no recruitment fees in professional categories where the employer bears recruitment costs.",

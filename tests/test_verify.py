@@ -5,12 +5,24 @@ from safepassage import verify as V
 from safepassage.extract import extract_content
 
 
+_LOAD_REGISTRY = V.load_registry.__wrapped__
+JO = "https://applications.slbfe.lk/jobbank/jsearchdisplay_an_m.asp?an="
+# Small fixture job orders (same columns as data/kb/slbfe_job_orders.csv); licences match the demo registry.
+JOB_ORDERS = pd.DataFrame([
+    ["1023", "Qatar", "Welder", 300000, "2026-01-10", "2099-01-09", JO + "1023"],
+    ["1023", "Japan", "Specified Skilled Worker (SSW) -Nursing Care", 1119985, "2025-11-27", "2099-11-26", JO + "1023"],
+    ["1023", "Japan", "Specified Skilled Worker (SSW) -Agriculture", 5000000, "2018-01-01", "2020-01-01", JO + "1023"],
+    ["1187", "U A E", "Driver - Heavy Vehicle", 1500000, "2026-03-01", "2099-03-01", JO + "1187"],
+], columns=["licence_no", "country", "job_title", "max_fee_lkr", "approved_date", "valid_until", "source"])
+
+
 @pytest.fixture(autouse=True)
 def demo_registry(monkeypatch):
-    """Always test against the committed demo registry, whatever is in data/processed."""
+    """Always test against the committed demo registry and the fixture job orders, never crawled or network data."""
     df = pd.read_csv(V.DEMO_REGISTRY, dtype=str).fillna("")
     df["key"] = df["name"].map(V.normalise)
     monkeypatch.setattr(V, "load_registry", lambda: df)
+    monkeypatch.setattr(V, "load_job_orders", lambda: JOB_ORDERS.copy())
 
 
 def run(text):
@@ -51,10 +63,59 @@ def test_domestic_middle_east_fee_and_personal_account():
 
 
 def test_fee_above_highest_cap_and_no_slbfe():
-    _, _, v = run("Factory workers for Romania. Placement fee Rs. 750,000. No need to register with SLBFE.")
+    _, _, v = run("Factory workers for Romania. Placement fee Rs. 2,500,000. No need to register with SLBFE.")
     assert [c.status for c in v.claims] == ["contradicted", "contradicted"]
 
 
 def test_fee_under_cap_is_unverifiable():
     _, claims, _ = run("Drivers for Dubai, processing fee Rs. 80,000.")
     assert claims == {("unverifiable", "Fee")}
+
+
+def fee_claims(v):
+    return [c for c in v.claims if c.claim.startswith("Fee")]
+
+
+def test_fee_above_job_order_maximum_is_contradicted():
+    status, _, v = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 1023. Welders for Qatar. Agency fee Rs. 350,000.")
+    [fee] = fee_claims(v)
+    assert status == "matched" and fee.status == "contradicted"
+    assert "Rs. 300,000" in fee.source and JO + "1023" in fee.source
+
+
+def test_fee_within_job_order_maximum_is_consistent():
+    _, _, v = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 1023. Nursing care workers for Japan. "
+                  "Agency fee Rs. 1,000,000.")
+    [fee] = fee_claims(v)
+    assert fee.status == "consistent" and "Nursing Care" in fee.source
+
+
+def test_job_order_country_alias_and_exact_cap():
+    _, _, v = run("Ceylon Horizon Manpower licence 1187. Heavy vehicle drivers for Dubai. Service fee Rs. 1,500,000.")
+    [fee] = fee_claims(v)
+    assert fee.status == "consistent" and "Driver - Heavy Vehicle" in fee.source
+
+
+def test_no_job_order_for_that_country_falls_back_to_global_cap():
+    _, claims, _ = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 1023. Welders for Oman. Agency fee Rs. 350,000.")
+    assert ("unverifiable", "Fee") in claims
+
+
+def test_global_cap_is_highest_currently_valid_job_order():
+    value, source = V.highest_valid_cap(JOB_ORDERS)
+    assert value == 1500000 and source == JO + "1187"  # the expired Rs. 5,000,000 order is ignored
+    _, _, v = run("Drivers for Dubai, processing fee Rs. 1,600,000.")
+    [fee] = fee_claims(v)
+    assert fee.status == "contradicted" and "Rs. 1,500,000" in fee.source
+
+
+def test_registry_prefers_slbfe_list_over_demo(tmp_path, monkeypatch):
+    real = tmp_path / "slbfe_registry.csv"
+    real.write_text("name,licence_no,status,source,retrieved\nREAL AGENCY (PVT) LTD,3532,licensed,https://x,2026-10-17\n")
+    demo_copy = tmp_path / "registry.csv"
+    demo_copy.write_text(V.DEMO_REGISTRY.read_text(encoding="utf-8"), encoding="utf-8")
+    monkeypatch.setattr(V, "SLBFE_REGISTRY", real)
+    monkeypatch.setattr(V, "REGISTRY_PATH", demo_copy)  # a stale copy of the demo list must not win
+    assert list(_LOAD_REGISTRY()["licence_no"]) == ["3532"]
+    monkeypatch.setattr(V, "SLBFE_REGISTRY", tmp_path / "missing.csv")
+    assert "1023" in set(_LOAD_REGISTRY()["licence_no"])  # demo is the last fallback
