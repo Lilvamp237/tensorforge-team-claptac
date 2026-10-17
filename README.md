@@ -217,23 +217,25 @@ python scripts/calibrate_drift.py   # novelty index + drift thresholds, reports/
 | Threshold 0.5 | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|
 | Real-world set, before real legit ads | 0.61 [0.47, 0.75] | 0.93 [0.83, 1.00] | 0.74 [0.62, 0.83] | 0.78 [0.66, 0.89] |
-| **Real-world set, now** | **0.73 [0.56, 0.87]** | 0.80 [0.65, 0.93] | **0.76 [0.63, 0.87]** | 0.79 [0.67, 0.90] |
+| **Real-world set, now** | **0.71 [0.53, 0.86]** | 0.73 [0.57, 0.88] | **0.72 [0.58, 0.83]** | 0.76 [0.64, 0.88] |
 
 This is the most realistic number we have, and it is lower than the synthetic scores. The first model flagged **60% of real legitimate ads**: it had never seen a real Sri Lankan legit ad, so real agency wording (fees, WhatsApp, deadlines) looked like scams. We added 89 real ikman.lk ads to **training only**. Each was labelled legit on outside evidence, never on the model's score: a licence number licensed in the real SLBFE registry, the AUTH AGENT badge, or a verified member account, with no severe red flag. That **halved false alarms on real legit ads to 30%** (18 → 9 of 30), and recall fell from 0.93 to 0.80 (28 → 24 of 30 scams). With 60 rows, the F1 gain sits inside the confidence interval. Analyst-confirmed labels from the review queue keep improving this through the retraining loop.
+
+**Reproducing these numbers.** The 89 real legit training ads are collected from public ikman.lk listings and are not committed (real ad text stays in the gitignored `data/processed/`). To rebuild them, run `collect_ikman.py --category overseas-jobs --category jobs --max-ads 240 --max-pages 8 --once --seen data/raw/ikman_seen.json` and then `build_weak_legit.py` before the pipeline (about 10 minutes). Without them, `bootstrap.py` trains the earlier model (real-world precision about 0.61, recall 0.93). Because listings change daily, a re-crawl gives slightly different numbers: this run caught 22 of 30 scams with 9 false alarms on 30 real legit ads; an earlier crawl caught 24 with the same 9.
 
 ### Held-out test set (n = 1,698, 33% scam, threshold 0.5)
 
 | Slice | n | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|---|
-| **Overall** | 1,698 | 0.77 | 0.86 | 0.81 [0.79, 0.83] | 0.94 [0.93, 0.95] |
-| EMSCAD (real ads) | 698 | 0.89 [0.82, 0.95] | 0.63 [0.53, 0.72] | 0.74 [0.66, 0.80] | 0.96 [0.95, 0.98] |
-| Synthetic Sri Lankan | 1,000 | 0.75 | 0.91 | 0.82 [0.80, 0.85] | 0.92 |
+| **Overall** | 1,698 | 0.77 [0.73, 0.80] | 0.86 [0.83, 0.88] | 0.81 [0.79, 0.83] | 0.94 [0.93, 0.95] |
+| EMSCAD (real ads) | 698 | 0.89 [0.82, 0.95] | 0.63 [0.54, 0.72] | 0.74 [0.66, 0.80] | 0.96 [0.94, 0.98] |
+| Synthetic Sri Lankan | 1,000 | 0.75 [0.71, 0.78] | 0.91 [0.89, 0.94] | 0.82 [0.80, 0.85] | 0.92 [0.90, 0.94] |
 
 | Language | n | Precision | Recall | F1 |
 |---|---|---|---|---|
 | English | 1,185 | 0.71 | 0.82 | 0.76 |
 | Sinhala | 206 | 0.87 | 0.91 | 0.89 |
-| Singlish | 307 | 0.84 | 0.91 | 0.88 |
+| Singlish | 307 | 0.84 | 0.91 | 0.87 |
 
 **Making the synthetic data harder lowered its scores on purpose.** The new data adds hard negatives (legit ads with fees, WhatsApp, deadlines), hard positives (scams without trigger words), held-out phrasing for every third line, and shortcut tokens balanced across classes. Synthetic recall fell from 0.99 to 0.91, and AUC from 0.99 to 0.92.
 
@@ -242,8 +244,8 @@ This is the most realistic number we have, and it is lower than the synthetic sc
 **At realistic scam rates.** At threshold 0.5 the model flags about 13% of legitimate test offers. If 5% of offers were scams, about 1 alert in 4 would be real (precision 0.26). If 1% were scams, about 1 in 16 would be.
 
 **Thresholds** (picked on a validation split, checked on test):
-- **0.77**: recall ≥ 0.9 on validation. On test: precision 0.83, recall 0.76, and precision 0.35 at a 5% scam rate. Validation is optimistic, so this threshold is not recall-first on test.
-- **0.42**: best F1 on validation. On test: precision 0.74, recall 0.88.
+- **0.77**: recall ≥ 0.9 on validation. On test: precision 0.84, recall 0.76, and precision 0.35 at a 5% scam rate. Validation is optimistic, so this threshold is not recall-first on test.
+- **0.46**: best F1 on validation. On test: precision 0.76, recall 0.87.
 
 The current settings are MEDIUM_RISK 0.4, which goes to human review, and HIGH_RISK 0.65 (inside the team's 0.64–0.7 range and recall-leaning; on test it labels 82% of scams "high", 9% of legit offers "high", and sends 6% of offers to review). We lean towards recall: a false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees.
 
@@ -260,13 +262,13 @@ A small logistic regression that combines the text score with the red flags and 
 | Tactic | n | Accuracy | Recall | Mean confidence |
 |---|---|---|---|---|
 | **Overall** | 800 | 0.87 | 0.94 | **0.82** (held-out: 0.90) |
-| Tamil-language offers | 300 | 0.82 | 0.90 | 0.79 |
-| Cyber-scam compound jobs | 58 | 0.86 | 0.84 | **0.74** |
+| Tamil-language offers | 300 | 0.83 | 0.91 | 0.79 |
+| Cyber-scam compound jobs | 58 | 0.84 | 0.82 | **0.74** |
 | Social / live-stream recruitment | 57 | 0.93 | 0.98 | 0.78 |
 | Digital-ID "verification fee" | 49 | 0.96 | 0.97 | 0.82 |
-| Crypto payment | 56 | 0.95 | 1.00 | 0.85 |
-| QR payment | 59 | 0.98 | 1.00 | 0.87 |
-| Military recruitment | 49 | 1.00 | 1.00 | 0.82 |
+| Crypto payment | 56 | 0.93 | 1.00 | 0.86 |
+| QR payment | 59 | 0.97 | 1.00 | 0.88 |
+| Military recruitment | 49 | 0.98 | 0.98 | 0.81 |
 
 Accuracy holds up, but **confidence drops** on new tactics. That silent degradation is what the drift monitor catches.
 
@@ -277,16 +279,16 @@ Thresholds are calibrated on 300 bootstrap windows of 200 predictions each: abov
 | Signal | Normal traffic, p99 | Shifted, median | Threshold |
 |---|---|---|---|
 | Language-mix PSI | 0.047 | 3.36 | 0.87 |
-| Content-type PSI | 0.065 | 1.02 | 0.30 |
-| Confidence drop | 0.019 | 0.075 | 0.033 |
-| Novelty share | 0.020 | 0.26 | 0.080 |
+| Content-type PSI | 0.065 | 0.90 | 0.27 |
+| Confidence drop | 0.018 | 0.073 | 0.032 |
+| Novelty share | 0.020 | 0.34 | 0.099 |
 
 | Scenario | Drift detected in |
 |---|---|
 | Normal held-out traffic | **0%** of windows (no false alarms) |
 | 100% shifted traffic | **100%** of windows |
 | 50% shifted mixed with normal | 100% |
-| 25% shifted mixed with normal | 35% (early warning only) |
+| 25% shifted mixed with normal | 33% (early warning only) |
 
 **End-to-end check:** `scripts/replay_shifted.py` streams held-out offers (no alert), then shifted offers through the live service. The drift alert fires, and high-risk scans switch to human review.
 
