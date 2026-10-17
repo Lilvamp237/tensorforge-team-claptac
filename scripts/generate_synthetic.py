@@ -414,6 +414,53 @@ def _merge_hard(table: dict, label: str) -> None:
 
 _merge_hard(HARD_NEGATIVES, "legit")
 
+# Hard positives: scams without the usual trigger words. Polite, professional tone; fees disguised as document
+# verification, medical booking or embassy appointments; "high success rate" instead of "guaranteed".
+HARD_POSITIVES = {
+    "en": {
+        "any": ["We kindly request a refundable document verification charge of {fee} to open your file.",
+                "Please book your medical through our partner centre; the medical booking fee is {fee}.",
+                "An embassy appointment slot costs {fee}, payable to our coordinator.",
+                "For registration, kindly send a clear copy of your NIC and passport to our officer.",
+                "Our agency has a very high visa success rate with past candidates.",
+                "Your offer letter will be released once the file opening charge is settled.",
+                "Our coordinator will personally guide you through every step of the process."],
+        "student_visa": ["Apply through us for a high visa success rate; the seat confirmation fee of {fee} is paid "
+                         "to our office."],
+        "visa_pr": ["We handle your PR file end to end; the assessment processing charge is {fee}."],
+        "local_job": ["Paid product review internship: review items online and receive weekly payments after a "
+                      "small starter deposit.",
+                      "Remote product review internship for students, earn {salary}, onboarding package {fee}."],
+    },
+    "singlish": {
+        "any": ["Document verification charge eka {fee} witharai, passe refund karanawa.",
+                "Medical booking eka api karanawa, {fee} gewanna.",
+                "Embassy appointment ekata {fee} coordinator ta denna.",
+                "Registration walata NIC eka passport eka copy ekak yawanna.",
+                "Api agency eke visa success rate eka godak high.",
+                "File eka open karanna charge eka gewwama offer letter eka denawa."],
+        "local_job": ["Product review internship ekak, gedara idan, starter deposit ekak witharai."],
+    },
+    "si": {
+        "any": ["ලේඛන සත්‍යාපන ගාස්තුව {fee} පමණි, පසුව ආපසු ලබා දෙනු ලැබේ.",
+                "වෛද්‍ය පරීක්ෂණය අප හරහා වෙන් කරන්න, ගාස්තුව {fee}.",
+                "තානාපති කාර්යාල හමුව සඳහා {fee} අපගේ නිලධාරියාට ගෙවන්න.",
+                "ලියාපදිංචිය සඳහා ජාතික හැඳුනුම්පත සහ ගමන් බලපත්‍රයේ පිටපතක් එවන්න.",
+                "අපගේ වීසා සාර්ථකත්ව අනුපාතය ඉතා ඉහළයි.",
+                "ගොනුව විවෘත කිරීමේ ගාස්තුව ගෙවූ පසු පත්වීම් ලිපිය ලබා දෙනු ලැබේ."],
+        "local_job": ["නිෂ්පාදන සමාලෝචන අභ්‍යාසලාභී තනතුරු, ආරම්භක තැන්පතුවක් පමණි."],
+    },
+}
+TAMIL["scam"] += [
+    "ஆவண சரிபார்ப்பு கட்டணம் {fee} மட்டுமே, பின்னர் திருப்பித் தரப்படும்.",
+    "மருத்துவ பரிசோதனை முன்பதிவுக்கு {fee} எம்மிடம் செலுத்தவும்.",
+    "தூதரக சந்திப்புக்கு {fee} எமது ஒருங்கிணைப்பாளரிடம் செலுத்தவும்.",
+    "பதிவுக்கு தேசிய அடையாள அட்டை மற்றும் கடவுச்சீட்டு நகலை அனுப்பவும்.",
+    "எமது விசா வெற்றி விகிதம் மிக அதிகம்.",
+    "தயாரிப்பு மதிப்பாய்வு பயிற்சி வேலை, ஆரம்ப வைப்புத்தொகை மட்டும்.",
+]
+_merge_hard(HARD_POSITIVES, "scam")
+
 NEW_TACTICS = {  # tactic -> (category, scam lines)
     "crypto_payment": ("foreign_job", [
         "Pay the processing fee in USDT (TRC20) to the wallet address below for faster visa processing.",
