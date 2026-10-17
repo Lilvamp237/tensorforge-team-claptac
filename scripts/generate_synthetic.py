@@ -66,6 +66,14 @@ AGENCY = ["Lanka Bright Overseas (Pvt) Ltd", "Ceylon Horizon Manpower", "Blue Lo
           "Serendib Global Careers", "Island Star Recruiters", "Kelani Gateway Agency", "Ruhunu Pathway Consultants",
           "Pearl Coast Education", "Sigiri Migration Services", "Dewdrop Study Abroad"]
 LIC = ["1023", "1187", "1542", "2051", "2316", "0987", "1764", "2290"]
+# Each agency's own licence number (the first six match data/kb/registry_demo.csv; Island Star is suspended there).
+# Legit ads quote their own agency's licence; scams may borrow a real-looking number.
+AGENCY_LICENCE = {"Lanka Bright Overseas (Pvt) Ltd": "1023", "Ceylon Horizon Manpower": "1187",
+                  "Blue Lotus Foreign Employment": "1542", "Serendib Global Careers": "2051",
+                  "Kelani Gateway Agency": "2316", "Island Star Recruiters": "0987",
+                  "Ruhunu Pathway Consultants": "3104", "Pearl Coast Education": "3220",
+                  "Sigiri Migration Services": "3377", "Dewdrop Study Abroad": "3412"}
+LEGIT_AGENCIES = [a for a in AGENCY if a != "Island Star Recruiters"]
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 # ---------------------------------------------------------------- phrase pools
@@ -377,7 +385,7 @@ def _split_pool(items: list[str], split: str, rng: random.Random) -> list[str]:
     return reserved if rng.random() < 0.5 else common
 
 
-def _fill(template: str, rng: random.Random, cat: str, label: str, country=None) -> str:
+def _fill(template: str, rng: random.Random, cat: str, label: str, country=None, agency=None, lic=None) -> str:
     slots = SLOTS[cat]
     values = {
         "country": country or rng.choice(slots["country"]),
@@ -387,8 +395,8 @@ def _fill(template: str, rng: random.Random, cat: str, label: str, country=None)
                               else (LEGIT_SALARY if label == "scam" else SCAM_SALARY))[cat]),
         "fee": rng.choice(SCAM_FEE),
         "legit_fee": rng.choice(LEGIT_FEE),
-        "agency": rng.choice(AGENCY),
-        "lic": rng.choice(LIC),
+        "agency": agency or rng.choice(AGENCY),
+        "lic": lic or rng.choice(LIC),
         "day": rng.choice(DAYS),
     }
     return template.format(**values)
@@ -397,7 +405,10 @@ def _fill(template: str, rng: random.Random, cat: str, label: str, country=None)
 def _render(parts: list[str], rng: random.Random, cat: str, label: str, country=None, salary=None) -> str:
     country = country or rng.choice(SLOTS[cat]["country"])
     sep = rng.choice([" ", "\n", " ", " | "])
-    text = sep.join(_fill(p, rng, cat, label, country) for p in parts)
+    # One agency per ad, used consistently in every line.
+    agency = rng.choice(LEGIT_AGENCIES if label == "legit" else AGENCY)
+    lic = AGENCY_LICENCE[agency] if label == "legit" or rng.random() < 0.3 else rng.choice(LIC)
+    text = sep.join(_fill(p, rng, cat, label, country, agency, lic) for p in parts)
     if salary:  # shifted set: amounts written in a format the model has never seen
         for pool in (SCAM_SALARY, LEGIT_SALARY):
             for v in pool[cat]:
