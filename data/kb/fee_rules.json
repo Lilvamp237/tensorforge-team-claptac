@@ -1,0 +1,23 @@
+{
+  "retrieved": "2026-10-17",
+  "slbfe_registration_fee_lkr": {
+    "value": 22027,
+    "note": "Initial SLBFE registration fee (Rs. 18,200 + 18% VAT + 2.5% SSCL), paid to SLBFE, can be paid online. Registration is compulsory before leaving (SLBFE Act s.53(3)).",
+    "source": "https://www.slbfe.lk/how-to-register-for-a-received-foreign-job/"
+  },
+  "domestic_middle_east_agency_fee_lkr": {
+    "value": 0,
+    "note": "SLBFE reports that no recruitment fees are charged for domestic work in Middle Eastern countries; the employer deposits a USD 1,500 safe deposit.",
+    "source": "https://www.sundaytimes.lk/221127/news/human-trafficking-us-report-highlights-lankas-failures-503423.html"
+  },
+  "highest_published_cap_lkr": {
+    "value": 450000,
+    "note": "SLBFE publishes a maximum fee per vacancy. The highest published maximum we found is Rs. 450,000 (Romania, 2022); Japan technical jobs were capped at Rs. 350,000 (2021). Anything above this is above every cap on record.",
+    "source": "https://themorning.lk/foreign-job-seekers-charged-exorbitantly"
+  },
+  "professional_jobs": {
+    "note": "Jobs in the SLBFE Professional manpower level. SLBFE reports no recruitment fees in professional categories where the employer bears recruitment costs.",
+    "source": "https://services.slbfe.lk/Info/JobClassification"
+  },
+  "middle_east_countries": ["Qatar", "United Arab Emirates", "Saudi Arabia", "Kuwait", "Oman", "Bahrain", "Jordan", "Lebanon", "Israel"]
+}
