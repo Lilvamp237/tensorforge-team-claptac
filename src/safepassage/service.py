@@ -96,3 +96,11 @@ def scan_audio(data: bytes, filename: str, language: str | None = None) -> Media
 
     text = transcribe(data, filename, language)
     return MediaScan(text, scan_text(text, source="file", media="audio"))
+
+
+def scan_image(data: bytes) -> MediaScan:
+    """Screenshot or photo -> OCR text -> the same pipeline. The image itself is never stored."""
+    from .media import ocr_image
+
+    text = ocr_image(data)
+    return MediaScan(text, scan_text(text, source="file", media="image"))
