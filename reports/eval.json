@@ -1,0 +1,239 @@
+{
+  "model_version": "safepassage-0.1.0",
+  "test": {
+    "overall": {
+      "n": 1941,
+      "scam_share": 0.311,
+      "accuracy": 0.901,
+      "precision": 0.785,
+      "recall": 0.937,
+      "f1": 0.854,
+      "mean_confidence": 0.911,
+      "predicted_scam_rate": 0.371,
+      "roc_auc": 0.981
+    },
+    "by_source": {
+      "emscad": {
+        "n": 941,
+        "scam_share": 0.15,
+        "accuracy": 0.948,
+        "precision": 0.89,
+        "recall": 0.745,
+        "f1": 0.811,
+        "mean_confidence": 0.929,
+        "predicted_scam_rate": 0.125,
+        "roc_auc": 0.977
+      },
+      "synthetic": {
+        "n": 1000,
+        "scam_share": 0.462,
+        "accuracy": 0.856,
+        "precision": 0.764,
+        "recall": 0.996,
+        "f1": 0.865,
+        "mean_confidence": 0.895,
+        "predicted_scam_rate": 0.602,
+        "roc_auc": 0.988
+      }
+    },
+    "by_language": {
+      "en": {
+        "n": 1453,
+        "scam_share": 0.261,
+        "accuracy": 0.929,
+        "precision": 0.837,
+        "recall": 0.905,
+        "f1": 0.869,
+        "mean_confidence": 0.916,
+        "predicted_scam_rate": 0.282,
+        "roc_auc": 0.983
+      },
+      "si": {
+        "n": 202,
+        "scam_share": 0.446,
+        "accuracy": 0.807,
+        "precision": 0.698,
+        "recall": 1.0,
+        "f1": 0.822,
+        "mean_confidence": 0.894,
+        "predicted_scam_rate": 0.639,
+        "roc_auc": 0.976
+      },
+      "singlish": {
+        "n": 286,
+        "scam_share": 0.469,
+        "accuracy": 0.822,
+        "precision": 0.729,
+        "recall": 0.985,
+        "f1": 0.838,
+        "mean_confidence": 0.898,
+        "predicted_scam_rate": 0.633,
+        "roc_auc": 0.979
+      }
+    },
+    "category_accuracy": 1.0
+  },
+  "shifted": {
+    "overall": {
+      "n": 800,
+      "scam_share": 0.599,
+      "accuracy": 0.876,
+      "precision": 0.878,
+      "recall": 0.921,
+      "f1": 0.899,
+      "mean_confidence": 0.802,
+      "predicted_scam_rate": 0.627,
+      "roc_auc": 0.949
+    },
+    "by_source": {
+      "synthetic_shifted": {
+        "n": 800,
+        "scam_share": 0.599,
+        "accuracy": 0.876,
+        "precision": 0.878,
+        "recall": 0.921,
+        "f1": 0.899,
+        "mean_confidence": 0.802,
+        "predicted_scam_rate": 0.627,
+        "roc_auc": 0.949
+      }
+    },
+    "by_language": {
+      "en": {
+        "n": 285,
+        "scam_share": 0.691,
+        "accuracy": 0.919,
+        "precision": 0.968,
+        "recall": 0.914,
+        "f1": 0.94,
+        "mean_confidence": 0.821,
+        "predicted_scam_rate": 0.653,
+        "roc_auc": 0.98
+      },
+      "si": {
+        "n": 28,
+        "scam_share": 0.536,
+        "accuracy": 0.857,
+        "precision": 0.789,
+        "recall": 1.0,
+        "f1": 0.882,
+        "mean_confidence": 0.87,
+        "predicted_scam_rate": 0.679,
+        "roc_auc": 0.99
+      },
+      "singlish": {
+        "n": 162,
+        "scam_share": 0.605,
+        "accuracy": 0.877,
+        "precision": 0.906,
+        "recall": 0.888,
+        "f1": 0.897,
+        "mean_confidence": 0.819,
+        "predicted_scam_rate": 0.593,
+        "roc_auc": 0.945
+      },
+      "ta": {
+        "n": 325,
+        "scam_share": 0.52,
+        "accuracy": 0.84,
+        "precision": 0.791,
+        "recall": 0.941,
+        "f1": 0.859,
+        "mean_confidence": 0.77,
+        "predicted_scam_rate": 0.618,
+        "roc_auc": 0.946
+      }
+    },
+    "by_tactic": {
+      "baseline": {
+        "n": 157,
+        "scam_share": 0.433,
+        "accuracy": 0.873,
+        "precision": 0.779,
+        "recall": 0.985,
+        "f1": 0.87,
+        "mean_confidence": 0.868,
+        "predicted_scam_rate": 0.548,
+        "roc_auc": 0.989
+      },
+      "crypto_payment": {
+        "n": 44,
+        "scam_share": 0.705,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_confidence": 0.831,
+        "predicted_scam_rate": 0.705,
+        "roc_auc": 1.0
+      },
+      "cyber_compound": {
+        "n": 57,
+        "scam_share": 0.737,
+        "accuracy": 0.895,
+        "precision": 1.0,
+        "recall": 0.857,
+        "f1": 0.923,
+        "mean_confidence": 0.751,
+        "predicted_scam_rate": 0.632,
+        "roc_auc": 1.0
+      },
+      "digital_id_fee": {
+        "n": 62,
+        "scam_share": 0.694,
+        "accuracy": 0.742,
+        "precision": 1.0,
+        "recall": 0.628,
+        "f1": 0.771,
+        "mean_confidence": 0.752,
+        "predicted_scam_rate": 0.435,
+        "roc_auc": 1.0
+      },
+      "military_recruit": {
+        "n": 56,
+        "scam_share": 0.875,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_confidence": 0.878,
+        "predicted_scam_rate": 0.875,
+        "roc_auc": 1.0
+      },
+      "qr_payment": {
+        "n": 53,
+        "scam_share": 0.717,
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "mean_confidence": 0.882,
+        "predicted_scam_rate": 0.717,
+        "roc_auc": 1.0
+      },
+      "social_live": {
+        "n": 46,
+        "scam_share": 0.848,
+        "accuracy": 0.891,
+        "precision": 1.0,
+        "recall": 0.872,
+        "f1": 0.932,
+        "mean_confidence": 0.713,
+        "predicted_scam_rate": 0.739,
+        "roc_auc": 1.0
+      },
+      "tamil": {
+        "n": 325,
+        "scam_share": 0.52,
+        "accuracy": 0.84,
+        "precision": 0.791,
+        "recall": 0.941,
+        "f1": 0.859,
+        "mean_confidence": 0.77,
+        "predicted_scam_rate": 0.618,
+        "roc_auc": 0.946
+      }
+    },
+    "category_accuracy": 0.99
+  }
+}
