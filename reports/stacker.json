@@ -1,0 +1,163 @@
+{
+ "threshold_rule": "highest threshold with val recall >= 0.95",
+ "threshold": 0.625,
+ "weights": {
+  "text_logit": 6.5,
+  "n_flags": 1.378,
+  "n_severe": 0.171,
+  "flag_upfront_fee": -0.545,
+  "flag_guaranteed": -0.048,
+  "flag_personal_account": 0.514,
+  "flag_contact_offplatform": -1.052,
+  "flag_task_scam": -0.063,
+  "flag_id_document_request": -0.47,
+  "flag_no_slbfe": 0.222,
+  "flag_crypto_payment": -0.147,
+  "flag_secrecy": 0.339,
+  "flag_urgency": -0.183,
+  "agency_matched": 0.048,
+  "agency_not_matched": -0.278,
+  "n_contradicted": -0.03,
+  "fee_within_cap": -0.366
+ },
+ "val": {
+  "text_model_at_0.5": {
+   "threshold": 0.5,
+   "missed_scams": 14,
+   "scams": 224,
+   "false_alarms": 5,
+   "legit": 461,
+   "precision": 0.977,
+   "recall": 0.938,
+   "f1": 0.957,
+   "false_alarm_rate": 0.011
+  },
+  "stacker_at_0.5": {
+   "threshold": 0.5,
+   "missed_scams": 10,
+   "scams": 224,
+   "false_alarms": 10,
+   "legit": 461,
+   "precision": 0.955,
+   "recall": 0.955,
+   "f1": 0.955,
+   "false_alarm_rate": 0.022
+  },
+  "stacker_at_val_threshold": {
+   "threshold": 0.625,
+   "missed_scams": 11,
+   "scams": 224,
+   "false_alarms": 9,
+   "legit": 461,
+   "precision": 0.959,
+   "recall": 0.951,
+   "f1": 0.955,
+   "false_alarm_rate": 0.02
+  }
+ },
+ "heldout_test": {
+  "text_model_at_0.5": {
+   "threshold": 0.5,
+   "missed_scams": 80,
+   "scams": 555,
+   "false_alarms": 145,
+   "legit": 1143,
+   "precision": 0.766,
+   "recall": 0.856,
+   "f1": 0.809,
+   "false_alarm_rate": 0.127
+  },
+  "stacker_at_0.5": {
+   "threshold": 0.5,
+   "missed_scams": 50,
+   "scams": 555,
+   "false_alarms": 170,
+   "legit": 1143,
+   "precision": 0.748,
+   "recall": 0.91,
+   "f1": 0.821,
+   "false_alarm_rate": 0.149
+  },
+  "stacker_at_val_threshold": {
+   "threshold": 0.625,
+   "missed_scams": 61,
+   "scams": 555,
+   "false_alarms": 149,
+   "legit": 1143,
+   "precision": 0.768,
+   "recall": 0.89,
+   "f1": 0.825,
+   "false_alarm_rate": 0.13
+  }
+ },
+ "shifted": {
+  "text_model_at_0.5": {
+   "threshold": 0.5,
+   "missed_scams": 30,
+   "scams": 499,
+   "false_alarms": 77,
+   "legit": 301,
+   "precision": 0.859,
+   "recall": 0.94,
+   "f1": 0.898,
+   "false_alarm_rate": 0.256
+  },
+  "stacker_at_0.5": {
+   "threshold": 0.5,
+   "missed_scams": 84,
+   "scams": 499,
+   "false_alarms": 100,
+   "legit": 301,
+   "precision": 0.806,
+   "recall": 0.832,
+   "f1": 0.819,
+   "false_alarm_rate": 0.332
+  },
+  "stacker_at_val_threshold": {
+   "threshold": 0.625,
+   "missed_scams": 109,
+   "scams": 499,
+   "false_alarms": 84,
+   "legit": 301,
+   "precision": 0.823,
+   "recall": 0.782,
+   "f1": 0.802,
+   "false_alarm_rate": 0.279
+  }
+ },
+ "real_world_TEST_ONLY": {
+  "text_model_at_0.5": {
+   "threshold": 0.5,
+   "missed_scams": 8,
+   "scams": 30,
+   "false_alarms": 9,
+   "legit": 30,
+   "precision": 0.71,
+   "recall": 0.733,
+   "f1": 0.721,
+   "false_alarm_rate": 0.3
+  },
+  "stacker_at_0.5": {
+   "threshold": 0.5,
+   "missed_scams": 4,
+   "scams": 30,
+   "false_alarms": 15,
+   "legit": 30,
+   "precision": 0.634,
+   "recall": 0.867,
+   "f1": 0.732,
+   "false_alarm_rate": 0.5
+  },
+  "stacker_at_val_threshold": {
+   "threshold": 0.625,
+   "missed_scams": 5,
+   "scams": 30,
+   "false_alarms": 15,
+   "legit": 30,
+   "precision": 0.625,
+   "recall": 0.833,
+   "f1": 0.714,
+   "false_alarm_rate": 0.5
+  }
+ }
+}
