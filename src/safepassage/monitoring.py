@@ -3,7 +3,7 @@
 import json
 from datetime import datetime, timezone
 
-from .config import ALERT_LOG, PREDICTION_LOG, REVIEW_QUEUE
+from . import config
 
 
 def _append(path, record: dict) -> None:
@@ -21,17 +21,17 @@ def _read(path) -> list[dict]:
 
 
 def log_prediction(record: dict) -> None:
-    _append(PREDICTION_LOG, record)
+    _append(config.PREDICTION_LOG, record)
 
 
 def read_log() -> list[dict]:
-    return _read(PREDICTION_LOG)
+    return _read(config.PREDICTION_LOG)
 
 
 def enqueue_review(record: dict) -> None:
-    _append(REVIEW_QUEUE, record)
+    _append(config.REVIEW_QUEUE, record)
 
 
 def raise_alert(kind: str, details: dict) -> None:
     # TODO(B): also POST to a webhook if ALERT_WEBHOOK_URL is set
-    _append(ALERT_LOG, {"kind": kind, **details})
+    _append(config.ALERT_LOG, {"kind": kind, **details})
