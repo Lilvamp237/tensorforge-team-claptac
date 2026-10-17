@@ -5,10 +5,14 @@ Saves
   models/baseline.joblib   scam classifier: word 1-2 grams + char 2-5 grams (char n-grams carry Sinhala and Singlish)
   models/category.joblib   content-type classifier (local_job | foreign_job | student_visa | visa_pr), synthetic rows only
   models/meta.json         training metadata used by evaluate.py and the drift monitor
+Analyst-confirmed labels in $SAFEPASSAGE_FEEDBACK (default data/processed/feedback.csv; columns text,label) are
+appended to the training data. Set SAFEPASSAGE_MODEL_DIR to write the models somewhere other than models/.
 """
 
 import json
+import os
 from datetime import datetime, timezone
+from pathlib import Path
 
 import joblib
 import pandas as pd
@@ -16,10 +20,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline, make_union
 
-from safepassage.config import DATA_DIR, MODEL_PATH, MODEL_VERSION, MODELS_DIR
+from safepassage.config import DATA_DIR, FEEDBACK_PATH, MODEL_PATH, MODEL_VERSION, MODELS_DIR
 
-CATEGORY_PATH = MODELS_DIR / "category.joblib"
-META_PATH = MODELS_DIR / "meta.json"
+OUT_DIR = Path(os.environ.get("SAFEPASSAGE_MODEL_DIR") or MODELS_DIR)
+MODEL_PATH = OUT_DIR / MODEL_PATH.name
+CATEGORY_PATH = OUT_DIR / "category.joblib"
+META_PATH = OUT_DIR / "meta.json"
 
 
 def text_features():
@@ -29,8 +35,24 @@ def text_features():
     )
 
 
+def merge_feedback(train: pd.DataFrame, feedback: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    """Append analyst-confirmed rows. The analyst label wins over any training row with the same text, and the
+    latest decision wins when the same text was confirmed twice."""
+    fb = feedback.dropna(subset=["text", "label"])
+    fb = fb[fb["label"].isin(["scam", "legit"])].drop_duplicates("text", keep="last")
+    overridden = int(train["text"].isin(fb["text"]).sum())
+    fb = fb[["text", "label"]].assign(category="unknown", language="unknown", source="feedback", tactic="feedback")
+    merged = pd.concat([train[~train["text"].isin(fb["text"])], fb], ignore_index=True)
+    return merged, {"feedback_rows": len(fb), "feedback_replaced_rows": overridden}
+
+
 def main():
     train = pd.read_csv(DATA_DIR / "processed" / "train.csv")
+    feedback_path = Path(os.environ.get("SAFEPASSAGE_FEEDBACK") or FEEDBACK_PATH)
+    feedback_info = {"feedback_rows": 0, "feedback_replaced_rows": 0}
+    if feedback_path.exists():
+        train, feedback_info = merge_feedback(train, pd.read_csv(feedback_path))
+        print(f"Added {feedback_info['feedback_rows']} analyst-confirmed rows from {feedback_path}")
 
     scam_model = make_pipeline(text_features(), LogisticRegression(max_iter=2000, C=4.0, class_weight="balanced"))
     scam_model.fit(train["text"], train["label"])
@@ -49,8 +71,9 @@ def main():
         "label_counts": train["label"].value_counts().to_dict(),
         "source_counts": train["source"].value_counts().to_dict(),
         "language_counts": train["language"].value_counts().to_dict(),
+        **feedback_info,
     }, indent=2))
-    print(f"Saved {MODEL_PATH.name}, {CATEGORY_PATH.name}, {META_PATH.name} to {MODELS_DIR}")
+    print(f"Saved {MODEL_PATH.name}, {CATEGORY_PATH.name}, {META_PATH.name} to {OUT_DIR}")
 
 
 if __name__ == "__main__":
