@@ -245,3 +245,183 @@ def best_so_far(scores):
         b = max(b, s)
         out.append(b)
     return out
+
+
+# ----------------------------------------------------------------------------------------------------------
+# 3. Objective: grouped CV with cached feature matrices
+# ----------------------------------------------------------------------------------------------------------
+
+
+def near_duplicate_groups(texts, threshold=0.7):
+    """Connected components of the 'cosine >= threshold' graph on digit-masked word TF-IDF."""
+    from scipy import sparse
+    from scipy.sparse.csgraph import connected_components
+    from sklearn.feature_extraction.text import TfidfVectorizer
+
+    masked = [re.sub(r"x{2,}", "#", re.sub(r"\d+", "0", t.lower())) for t in texts]
+    X = TfidfVectorizer().fit_transform(masked)
+    rows, cols = [], []
+    for s in range(0, X.shape[0], 2000):
+        sim = (X[s:s + 2000] @ X.T).toarray()
+        r, c = np.nonzero(sim >= threshold)
+        rows.append(r + s)
+        cols.append(c)
+    rows, cols = np.concatenate(rows), np.concatenate(cols)
+    graph = sparse.coo_matrix((np.ones(len(rows)), (rows, cols)), shape=(X.shape[0],) * 2)
+    return connected_components(graph, directed=False)[1]
+
+
+def _idf(counts_csc, n_docs):
+    """Smooth IDF exactly as TfidfVectorizer: ln((1 + n) / (1 + df)) + 1, df = documents containing the term."""
+    df = np.diff(counts_csc.indptr)
+    return np.log((1 + n_docs) / (1 + df)) + 1.0
+
+
+class CountBank:
+    """Raw n-gram counts of one fold's train/validation texts, from which any TF-IDF config is rebuilt.
+
+    kind='word': CountVectorizer(ngram_range=(1, 3))        -> word n-grams, sliced by number of tokens
+    kind='char': CountVectorizer(analyzer='char_wb', (2, 6)) -> char n-grams, sliced by string length
+    """
+
+    def __init__(self, kind, train_texts, val_texts):
+        from sklearn.feature_extraction.text import CountVectorizer
+
+        self.kind = kind
+        if kind == "word":
+            cv = CountVectorizer(ngram_range=(1, 3), dtype=np.int64)
+        else:
+            cv = CountVectorizer(analyzer="char_wb", ngram_range=(2, 6), dtype=np.int64)
+        self.Xtr = cv.fit_transform(train_texts).tocsc()
+        self.Xva = cv.transform(val_texts).tocsc()
+        names = cv.get_feature_names_out()  # alphabetical, as TfidfVectorizer's vocabulary
+        # n-gram order of each column: number of tokens (word) or string length (char). Slicing the 2-6 char
+        # counts by length is exact because char_wb emits a padded word shorter than n once, at n = its length,
+        # and then stops; padded words are at least 3 characters long, so this holds whenever lo <= 3.
+        self.length = np.array([n.count(" ") + 1 if kind == "word" else len(n) for n in names])
+        self.df = np.diff(self.Xtr.indptr)
+        self.n_train = self.Xtr.shape[0]
+
+    def block(self, lo, hi, min_df, max_features, sublinear):
+        """Return (train, val) TF-IDF matrices identical to TfidfVectorizer(ngram_range=(lo, hi), min_df,
+        max_features, sublinear_tf) fitted on the train texts (smooth_idf=True, norm='l2')."""
+        from sklearn.preprocessing import normalize
+
+        if self.kind == "char" and lo > 3:
+            raise ValueError("char n-gram slices are exact only for lo <= 3")
+        cand = np.where((self.length >= lo) & (self.length <= hi) & (self.df >= min_df))[0]
+        Xtr, Xva = self.Xtr[:, cand], self.Xva[:, cand]
+        if max_features is not None and len(cand) > max_features:
+            tfs = np.asarray(Xtr.sum(axis=0)).ravel()
+            keep = np.sort((-tfs).argsort()[:max_features])
+            Xtr, Xva = Xtr[:, keep], Xva[:, keep]
+        idf = _idf(Xtr, self.n_train)
+        out = []
+        for X in (Xtr, Xva):
+            X = X.tocsr().astype(np.float64)
+            if sublinear:
+                X.data = 1.0 + np.log(X.data)
+            X = X.multiply(idf).tocsr()
+            out.append(normalize(X))
+        return out
+
+
+def word_params(cfg):
+    return (1, cfg["word_ngram_max"], cfg.get("word_min_df", cfg["min_df"]), WORD_MAX_FEATURES, cfg["sublinear_tf"])
+
+
+def char_params(cfg):
+    lo, hi = cfg["char_ngram"]
+    return (lo, hi, cfg.get("char_min_df", cfg["min_df"]), cfg["char_max_features"], cfg["sublinear_tf"])
+
+
+def make_classifier(cfg):
+    from sklearn.linear_model import LogisticRegression
+    return LogisticRegression(C=cfg["C"], class_weight=cfg["class_weight"], max_iter=2000)
+
+
+class CVObjective:
+    """mean F1 over fixed folds; logs every call as a trial."""
+
+    def __init__(self, texts, y, folds, cache_size=32, n_jobs=-1):
+        from joblib import Parallel, delayed
+
+        self.y, self.folds = y, folds
+        t = time.time()
+        jobs = [(kind, [texts[i] for i in tr], [texts[i] for i in va]) for tr, va in folds for kind in ("word", "char")]
+        banks = Parallel(n_jobs=n_jobs)(delayed(CountBank)(*j) for j in jobs)  # processes: tokenising holds the GIL
+        self.banks = [{"word": banks[2 * f], "char": banks[2 * f + 1]} for f in range(len(folds))]
+        self.setup_seconds = time.time() - t
+        self.cache = [OrderedDict() for _ in folds]  # one LRU cache per fold, so fold threads never share one
+        self.cache_size = cache_size
+        self.n_jobs = n_jobs
+        self.memo = {}
+        self.log = []
+
+    def _block(self, fold, kind, params):
+        cache, key = self.cache[fold], (kind, params)
+        if key in cache:
+            cache.move_to_end(key)
+            return cache[key]
+        val = self.banks[fold][kind].block(*params)
+        cache[key] = val
+        if len(cache) > self.cache_size:
+            cache.popitem(last=False)
+        return val
+
+    def _fold_f1(self, cfg, f):
+        from scipy.sparse import hstack
+        from sklearn.metrics import f1_score
+
+        wtr, wva = self._block(f, "word", word_params(cfg))
+        ctr, cva = self._block(f, "char", char_params(cfg))
+        tr, va = self.folds[f]
+        clf = make_classifier(cfg)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            clf.fit(hstack([wtr, ctr]).tocsr(), self.y[tr])
+        p = clf.predict_proba(hstack([wva, cva]).tocsr())[:, 1]
+        return f1_score(self.y[va], (p >= 0.5).astype(int), zero_division=0)
+
+    def __call__(self, cfg):
+        from joblib import Parallel, delayed
+
+        t = time.time()
+        key = config_key(cfg)
+        if key in self.memo:  # identical config already scored (the objective is deterministic)
+            fold_f1 = self.memo[key]
+        else:
+            # one thread per fold: build (or fetch) its TF-IDF blocks, fit, score
+            fold_f1 = Parallel(n_jobs=self.n_jobs, backend="threading")(
+                delayed(self._fold_f1)(cfg, f) for f in range(len(self.folds)))
+            self.memo[key] = fold_f1
+        score = float(np.mean(fold_f1))
+        self.log.append({"params": jsonable(cfg), "cv_f1": round(score, 5),
+                         "fold_f1": [round(float(v), 4) for v in fold_f1], "seconds": round(time.time() - t, 3)})
+        return score
+
+
+def config_key(cfg):
+    return tuple((k, round(v, 10) if isinstance(v, float) else v) for k, v in sorted(cfg.items()))
+
+
+def jsonable(cfg):
+    return {k: (list(v) if isinstance(v, tuple) else (round(v, 6) if isinstance(v, float) else v))
+            for k, v in cfg.items()}
+
+
+def build_pipeline(cfg):
+    """The real sklearn pipeline for a config (used for the final refit and by the training script later)."""
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.pipeline import make_pipeline, make_union
+
+    _, wmax, wmin, wfeat, sub = word_params(cfg)
+    clo, chi, cmin, cfeat, _ = char_params(cfg)
+    return make_pipeline(
+        make_union(
+            TfidfVectorizer(ngram_range=(1, wmax), min_df=wmin, sublinear_tf=sub, max_features=wfeat),
+            TfidfVectorizer(analyzer="char_wb", ngram_range=(clo, chi), min_df=cmin, sublinear_tf=sub,
+                            max_features=cfeat),
+        ),
+        make_classifier(cfg),
+    )
