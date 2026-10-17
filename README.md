@@ -92,6 +92,8 @@ streamlit run app/streamlit_app.py
 python -m safepassage.mcp_server
 ```
 
+Screenshot scanning needs the Tesseract binary with the Sinhala and Tamil language packs. On Windows, use the [UB-Mannheim installer](https://github.com/UB-Mannheim/tesseract/wiki) and tick **Sinhala** and **Tamil** under additional languages. On Debian/Ubuntu, run `apt-get install tesseract-ocr tesseract-ocr-sin tesseract-ocr-tam`. Voice notes need nothing extra: the Whisper model downloads on the first voice note.
+
 ### Drift demo
 
 ```bash
@@ -116,6 +118,7 @@ Choose transport **Streamable HTTP** and URL `http://localhost:8001/mcp`, then c
 | POST | `/api/v1/scans/url` | Fetch and scan a public page |
 | POST | `/api/v1/scans/file` | Scan an uploaded PDF/TXT |
 | POST | `/api/v1/scans/audio` | Scan a voice note (mp3/wav/m4a/ogg, up to 3 min and 10 MB; optional `?language=en\|ta\|si`). Returns the result plus `extracted_text` (what we heard). The first call downloads the Whisper *small* model (~460 MB). |
+| POST | `/api/v1/scans/image` | Scan a screenshot or photo (png/jpg, up to 10 MB). Text is read with Tesseract (English, Sinhala, Tamil). Returns the result plus `extracted_text` (what we read). |
 | GET | `/api/v1/drift` | Current drift signals |
 | GET | `/api/v1/alerts` | Alert history |
 | GET / POST | `/api/v1/reviews`, `/api/v1/reviews/{id}` | Review queue and analyst decisions |
@@ -264,5 +267,5 @@ Every one of these people passes through channels we can sit in: SLBFE registrat
 - Much of the Sri Lankan training data is synthetic, and Sinhala and Singlish precision is lower (0.64–0.69). Analyst-confirmed labels from the review queue are the route to real-world data.
 - Mixed traffic with only about 25% new-tactic offers is detected in 20% of windows, so early drift is caught later than full drift.
 - The verifier is deterministic (registry and rule checks). There is no LLM claim checker yet.
-- Image (screenshot) OCR is not implemented. Text, links, PDFs and voice notes are.
+- Screenshots are read with Tesseract. English is reliable; **Sinhala OCR makes character-level mistakes** (e.g. a vowel sign or conjunct misread), so some Sinhala red-flag phrases can be missed. Tamil needs the `tam` language pack installed; without it only English and Sinhala are read. Uploaded images are never stored.
 - Voice notes are transcribed with Whisper *small* on CPU. It handles English and Tamil reasonably but is **weak on Sinhala**, so Sinhala voice notes may be scored on a poor transcript; the transcript is shown to the user and kept in the review queue so analysts can see what was heard. Uploaded audio is never stored.
