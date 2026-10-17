@@ -6,7 +6,7 @@ Run: PYTHONPATH=src streamlit run app/streamlit_app.py
 import pandas as pd
 import streamlit as st
 
-from safepassage import reputation
+from safepassage import reputation, retrain
 from safepassage.fetch import UnsafeURL
 from safepassage.monitoring import pending_reviews, read_alerts, read_log
 from safepassage.response import check_drift, trigger_retrain
@@ -103,8 +103,20 @@ with analyst_tab:
     right.json(lists["allow"])
 
     st.subheader("Model")
-    a, b = st.columns(2)
+    models = retrain.status()
+    last = models["last_retrain"]
+    st.write(f"**Current version:** {models['current'] or 'initial (unversioned)'}"
+             f" · previous: {models['previous'] or 'none'}")
+    if last:
+        held = (last.get("candidate") or {}).get("heldout", {})
+        msg = (f"Last retrain {last['version']}: **{last['status'].upper()}** "
+               f"(held-out F1 {held.get('f1', '-')}, recall {held.get('recall', '-')})")
+        {"promoted": st.success, "rejected": st.warning}.get(last["status"], st.error)(msg)
+        st.caption("; ".join(last.get("gate", [])) or last.get("error", ""))
+    a, b, c = st.columns(3)
     if a.button("Retrain with confirmed labels"):
-        st.write(trigger_retrain())
+        st.write(trigger_retrain("analyst console"))
     if b.button("Reload model"):
         st.write({"model_loaded": reload_model()})
+    if c.button("Roll back to previous version", disabled=not models["previous"]):
+        st.write(retrain.rollback())
