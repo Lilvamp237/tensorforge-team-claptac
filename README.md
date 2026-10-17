@@ -83,7 +83,7 @@ On first start the `api` container builds any missing models (`scripts/bootstrap
 
 Optional: `ALERT_WEBHOOK_URL=https://... docker compose up` also posts drift alerts to a webhook.
 
-### Without Docker (Python 3.12)
+### Without Docker (Python 3.14)
 
 ```bash
 pip install -r requirements.txt
