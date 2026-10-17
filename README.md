@@ -200,11 +200,11 @@ python scripts/calibrate_drift.py   # novelty index + drift thresholds, reports/
 
 ### Sri Lankan real-world set (n = 60, test only)
 
-`data/handwritten.csv`: 30 real legitimate ads (SLBFE job bank orders, ikman.lk ads from licensed agencies, official notices) and 30 scam offers, all with personal details removed. **Only 2 scam rows are real ads and 1 is partly quoted from a police warning. The other 27 are reconstructed from public warnings and news reports**, because those rarely quote the ad text. Sources and the human-verification status are in `data/handwritten_SOURCES.md`.
+`data/handwritten.csv`: 30 real legitimate ads (SLBFE job bank orders, ikman.lk ads from licensed agencies, official notices) and 30 scam offers, all with personal details removed. **Only 2 scam rows are real ads and 1 is partly quoted from a police warning. The other 27 are reconstructed from public warnings and news reports**, because those rarely quote the ad text. Every scam reconstruction was re-checked against its article on 17 Oct and details the article does not support were removed (39 of 60 rows are now verified; the review log and remaining open rows are in `data/handwritten_SOURCES.md`).
 
 | Threshold 0.5 | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|
-| Real-world set | 0.61 [0.47, 0.75] | **0.93 [0.83, 1.00]** | 0.74 [0.62, 0.83] | 0.78 [0.66, 0.89] |
+| Real-world set | 0.61 [0.47, 0.75] | **0.93 [0.83, 1.00]** | 0.74 [0.62, 0.83] | 0.76 [0.63, 0.87] |
 
 This is the most realistic number we have, and it is much lower than the synthetic scores. The model catches most scams, but it flags **60% of real legitimate ads**. Real agency ads use wording the synthetic legit ads don't. Analyst-confirmed labels from the review queue and the retraining loop are how this improves.
 
