@@ -45,11 +45,15 @@ def load(name: str) -> pd.DataFrame | None:
     return pd.read_csv(path) if path.exists() else None
 
 
+def offer_lines(text: str) -> list[str]:
+    """Lines / sentences of an offer, skeleton-normalised (the unit the synthetic generator recombines)."""
+    return [skeleton(x) for x in re.split(r"\n| \| |(?<=[.!?])\s+", text) if len(x.strip()) > 3]
+
+
 def line_overlap(train: pd.DataFrame, other: pd.DataFrame) -> float:
     """Share of `other`'s lines / sentences that occur verbatim (after skeleton normalisation) in train."""
-    split = lambda s: [x for x in re.split(r"\n| \| |(?<=[.!?])\s+", s) if len(x.strip()) > 3]  # noqa: E731
-    train_lines = {skeleton(x) for t in train["text"] for x in split(t)}
-    lines = [skeleton(x) for t in other["text"] for x in split(t)]
+    train_lines = {x for t in train["text"] for x in offer_lines(t)}
+    lines = [x for t in other["text"] for x in offer_lines(t)]
     return round(sum(x in train_lines for x in lines) / max(len(lines), 1), 3)
 
 
