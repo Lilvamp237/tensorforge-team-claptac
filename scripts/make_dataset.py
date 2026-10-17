@@ -180,6 +180,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--emscad-legit", type=int, default=4000, help="number of legit EMSCAD ads to keep")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--no-weak", action="store_true", help="leave out data/processed/weak_legit.csv")
     args = ap.parse_args()
 
     download_emscad()
@@ -190,6 +191,11 @@ def main():
     em_train, em_test = train_test_split(emscad, test_size=0.2, stratify=emscad["label"], random_state=args.seed)
 
     train = pd.concat([em_train, pd.read_csv(SYN / "synthetic_train.csv")])
+    weak = OUT / "weak_legit.csv"  # real ikman ads, weakly labelled legit (scripts/build_weak_legit.py); train only
+    if weak.exists() and not args.no_weak:
+        weak_df = pd.read_csv(weak)
+        train = pd.concat([train, weak_df])
+        print(f"added {len(weak_df)} weakly labelled real legit ads to train")
     test = pd.concat([em_test, pd.read_csv(SYN / "synthetic_test.csv")])
     shifted = pd.read_csv(SYN / "shifted.csv")
     train = train.reset_index(drop=True)
