@@ -1,0 +1,2 @@
+[server]
+maxUploadSize = 10  # MB, same cap as the REST API for voice notes and screenshots
