@@ -40,7 +40,8 @@ def pending_reviews() -> list[dict]:
     done = {r["review_id"] for r in _read(config.REVIEWED_LOG)}
     pending = {}
     for item in _read(config.REVIEW_QUEUE):
-        if item["review_id"] not in done:
+        item["review_id"] = item.get("review_id") or item.get("scan_id")  # entries logged before review ids existed
+        if item["review_id"] and item["review_id"] not in done:
             pending[item["review_id"]] = item  # latest entry wins for repeated items
     return list(pending.values())
 
