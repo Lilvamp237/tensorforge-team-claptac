@@ -171,6 +171,60 @@ python scripts/evaluate.py          # reports/eval.json
 python scripts/calibrate_drift.py   # novelty index + drift thresholds, reports/drift_calibration.json
 ```
 
+## Evaluation results
+
+**Model:** logistic regression on word 1–2-gram + character 2–5-gram TF-IDF features. The character n-grams carry Sinhala, Tamil and Singlish without a translation step. A second classifier predicts the content type. Numbers come from `reports/eval.json`. Neither the test set nor the shifted set was used in training.
+
+### Held-out test set (n = 1,941, 30% scam)
+
+| Slice | n | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|---|---|
+| **Overall** | 1,941 | 0.883 | 0.745 | **0.932** | 0.828 | **0.975** |
+| EMSCAD (real ads) | 941 | 0.949 | 0.904 | 0.738 | 0.812 | 0.977 |
+| Synthetic Sri Lankan | 1,000 | 0.821 | 0.716 | 0.993 | 0.832 | 0.983 |
+| English | 1,426 | 0.921 | 0.814 | 0.891 | 0.851 | 0.979 |
+| Sinhala | 228 | 0.763 | 0.640 | 1.000 | 0.780 | 0.968 |
+| Singlish | 287 | 0.787 | 0.686 | 0.992 | 0.811 | 0.974 |
+
+Content-type accuracy on the synthetic test rows: 1.00.
+
+The model leans towards recall: it misses few scams (recall 0.93) and over-flags some legitimate offers (precision 0.75), especially in Sinhala and Singlish. That's deliberate for a pre-payment warning tool. A false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees. Medium-risk scores go to human review rather than being shown as verdicts.
+
+### Shifted set (n = 800): how the model holds up on new tactics
+
+| Tactic | n | Accuracy | Recall | Mean confidence |
+|---|---|---|---|---|
+| **Overall** | 800 | 0.884 | 0.935 | **0.810** (held-out: 0.907) |
+| Tamil-language offers | 323 | 0.882 | 0.977 | 0.781 |
+| Digital-ID "verification fee" | 55 | **0.691** | **0.630** | 0.731 |
+| Social / live-stream recruitment | 57 | 0.877 | 0.837 | 0.758 |
+| Cyber-scam compound jobs | 44 | 0.909 | 0.892 | 0.758 |
+| Crypto payment | 47 | 1.000 | 1.000 | 0.830 |
+| QR payment | 62 | 1.000 | 1.000 | 0.883 |
+| Military recruitment | 55 | 1.000 | 1.000 | 0.858 |
+
+Accuracy stays reasonable overall, but **confidence drops** and the newest pretext (digital-ID fees) is where the model starts to fail. That silent degradation is exactly what the monitoring layer is built to catch.
+
+### Drift detection (`reports/drift_calibration.json`)
+
+Thresholds are calibrated on 300 bootstrap windows of 200 predictions each: above normal held-out traffic, below the shifted set.
+
+| Signal | Normal traffic, p99 | Shifted, median | Threshold |
+|---|---|---|---|
+| Language-mix PSI | 0.036 | 3.66 | 0.94 |
+| Content-type PSI | 0.067 | 1.38 | 0.40 |
+| Confidence drop | 0.019 | 0.098 | 0.038 |
+| Novelty share | 0.045 | 0.39 | 0.13 |
+
+| Scenario | Drift detected in |
+|---|---|
+| Normal held-out traffic | **0%** of windows (no false alarms) |
+| 100% shifted traffic | **100%** of windows |
+| 50% shifted mixed with normal | 100% |
+| 25% shifted mixed with normal | 20% (early warning only) |
+
+**End-to-end check:** `scripts/replay_shifted.py` streams 120 held-out offers (no alert), then shifted offers through the live service. The drift alert fires within 60 shifted scans, and high-risk scans switch to human review.
+
 ## Still to complete
 
 - Problem and users
