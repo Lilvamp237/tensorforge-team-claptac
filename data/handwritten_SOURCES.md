@@ -88,6 +88,24 @@ Row N is the Nth data record, not counting the header. Some texts span several l
 - Label: legit: 30, scam: 30
 - Category: foreign_job: 30, local_job: 21, student_visa: 4, visa_pr: 5
 - Language: en: 39, mixed: 3, si: 10, singlish: 3, ta: 5
-- needs_review: no: 19, yes: 41
+- needs_review: no: 39, yes: 21
 
 A teammate must check every label before any number from this set is quoted.
+
+## Review log (2026-10-17)
+
+Every scam reconstruction was re-read against its cited article. Details the article does not support were removed; the label was kept only where the article confirms a scam.
+
+| Rows | Outcome | needs_review |
+|---|---|---|
+| 31, 38–42, 44, 45, 49, 51–53, 55, 56 | Text matches the article (52 and 53 are covered by the SLCERT warning that names CBSL and SriLankan Airlines; 49 uses the phrases the Police quote) | no |
+| 33, 34, 43, 46, 50 | Unsupported details removed: 33 "payment instructions", 34 "no EPS-TOPIK exam", 43 "guaranteed work permit", 46 job types / "no agency needed" / visa arrangement, 50 "VIP level" | no |
+| 13 | Licence 3811 confirmed as a licensed agency in `data/kb/slbfe_registry.csv` | no |
+| 32, 54 | Facts match the article; Sinhala wording still needs a native speaker | yes |
+| 35, 36, 37 | Facts corrected (35 no EPS-TOPIK claim; 36 no visa/ticket or advance claim; 37 victims were called to Colombo for fingerprints, the payment place is not stated); Sinhala/Tamil wording still needs a native speaker | yes |
+| 47, 48, 57, 58 | Sources not re-checked yet (48 relies partly on a second article for the visit-visa and fee details) | yes |
+| 14, 16–23, 26 | Real ikman.lk ads from unnamed or small employers; plausible legit, but the employer cannot be verified from the ad | yes |
+| 59, 60 | Real ads that only *match* the Police task-job pattern. **Labels are suspected, not confirmed** | yes |
+
+No genuinely quoted scam ad was found in the cited articles: they describe offers but do not reproduce them, apart from the short phrases in row 49.
+

@@ -4,13 +4,13 @@
     "overall": {
       "n": 1698,
       "scam_share": 0.327,
-      "accuracy": 0.862,
-      "precision": 0.758,
-      "recall": 0.849,
-      "f1": 0.801,
-      "mean_confidence": 0.896,
-      "predicted_scam_rate": 0.366,
-      "roc_auc": 0.936
+      "accuracy": 0.868,
+      "precision": 0.767,
+      "recall": 0.856,
+      "f1": 0.809,
+      "mean_confidence": 0.897,
+      "predicted_scam_rate": 0.365,
+      "roc_auc": 0.94
     },
     "by_source": {
       "emscad": {
@@ -20,182 +20,182 @@
         "precision": 0.887,
         "recall": 0.628,
         "f1": 0.736,
-        "mean_confidence": 0.914,
+        "mean_confidence": 0.916,
         "predicted_scam_rate": 0.115,
-        "roc_auc": 0.962
+        "roc_auc": 0.961
       },
       "synthetic": {
         "n": 1000,
         "scam_share": 0.442,
-        "accuracy": 0.817,
-        "precision": 0.739,
-        "recall": 0.905,
-        "f1": 0.814,
+        "accuracy": 0.827,
+        "precision": 0.75,
+        "recall": 0.914,
+        "f1": 0.824,
         "mean_confidence": 0.884,
-        "predicted_scam_rate": 0.541,
-        "roc_auc": 0.914
+        "predicted_scam_rate": 0.539,
+        "roc_auc": 0.92
       }
     },
     "by_language": {
       "en": {
         "n": 1185,
         "scam_share": 0.27,
-        "accuracy": 0.857,
-        "precision": 0.705,
-        "recall": 0.806,
-        "f1": 0.752,
+        "accuracy": 0.859,
+        "precision": 0.707,
+        "recall": 0.816,
+        "f1": 0.758,
         "mean_confidence": 0.91,
-        "predicted_scam_rate": 0.309,
-        "roc_auc": 0.93
+        "predicted_scam_rate": 0.311,
+        "roc_auc": 0.932
       },
       "si": {
         "n": 206,
         "scam_share": 0.442,
-        "accuracy": 0.883,
-        "precision": 0.845,
-        "recall": 0.901,
-        "f1": 0.872,
-        "mean_confidence": 0.867,
-        "predicted_scam_rate": 0.471,
-        "roc_auc": 0.968
+        "accuracy": 0.903,
+        "precision": 0.874,
+        "recall": 0.912,
+        "f1": 0.892,
+        "mean_confidence": 0.868,
+        "predicted_scam_rate": 0.461,
+        "roc_auc": 0.973
       },
       "singlish": {
         "n": 307,
         "scam_share": 0.469,
-        "accuracy": 0.87,
-        "precision": 0.829,
+        "accuracy": 0.879,
+        "precision": 0.845,
         "recall": 0.91,
-        "f1": 0.868,
-        "mean_confidence": 0.864,
-        "predicted_scam_rate": 0.515,
-        "roc_auc": 0.948
+        "f1": 0.876,
+        "mean_confidence": 0.866,
+        "predicted_scam_rate": 0.505,
+        "roc_auc": 0.954
       }
     },
-    "category_accuracy": 0.993,
+    "category_accuracy": 0.992,
     "overall_ci": {
       "accuracy": [
-        0.846,
-        0.879
+        0.852,
+        0.885
       ],
       "precision": [
-        0.724,
-        0.788
+        0.735,
+        0.799
       ],
       "recall": [
-        0.817,
-        0.879
+        0.826,
+        0.884
       ],
       "f1": [
-        0.776,
-        0.826
+        0.786,
+        0.833
       ],
       "roc_auc": [
-        0.924,
-        0.947
+        0.929,
+        0.95
       ],
       "precision_at_1%": [
-        0.053,
-        0.071
+        0.056,
+        0.075
       ],
       "precision_at_5%": [
-        0.227,
-        0.285
+        0.235,
+        0.296
       ],
       "precision_at_10%": [
-        0.383,
-        0.457
+        0.393,
+        0.471
       ]
     },
     "base_rates": {
       "1%": {
-        "precision": 0.061,
-        "false_alarms_per_1000_offers": 129.9,
-        "scams_caught_per_1000_offers": 8.5,
-        "scams_missed_per_1000_offers": 1.5,
-        "false_alarms_per_scam_caught": 15.31
+        "precision": 0.064,
+        "false_alarms_per_1000_offers": 124.7,
+        "scams_caught_per_1000_offers": 8.6,
+        "scams_missed_per_1000_offers": 1.4,
+        "false_alarms_per_scam_caught": 14.57
       },
       "5%": {
-        "precision": 0.254,
-        "false_alarms_per_1000_offers": 124.7,
-        "scams_caught_per_1000_offers": 42.4,
-        "scams_missed_per_1000_offers": 7.6,
-        "false_alarms_per_scam_caught": 2.94
+        "precision": 0.263,
+        "false_alarms_per_1000_offers": 119.7,
+        "scams_caught_per_1000_offers": 42.8,
+        "scams_missed_per_1000_offers": 7.2,
+        "false_alarms_per_scam_caught": 2.8
       },
       "10%": {
-        "precision": 0.418,
-        "false_alarms_per_1000_offers": 118.1,
-        "scams_caught_per_1000_offers": 84.9,
-        "scams_missed_per_1000_offers": 15.1,
-        "false_alarms_per_scam_caught": 1.39
+        "precision": 0.43,
+        "false_alarms_per_1000_offers": 113.4,
+        "scams_caught_per_1000_offers": 85.6,
+        "scams_missed_per_1000_offers": 14.4,
+        "false_alarms_per_scam_caught": 1.32
       }
     },
     "by_source_ci": {
       "emscad": {
         "accuracy": [
-          0.907,
+          0.908,
           0.946
         ],
         "precision": [
           0.817,
-          0.949
+          0.95
         ],
         "recall": [
-          0.534,
-          0.718
+          0.537,
+          0.719
         ],
         "f1": [
-          0.66,
-          0.8
+          0.659,
+          0.802
         ],
         "roc_auc": [
-          0.945,
-          0.977
+          0.942,
+          0.976
         ],
         "precision_at_1%": [
-          0.194,
-          0.494
+          0.195,
+          0.507
         ],
         "precision_at_5%": [
-          0.556,
-          0.836
+          0.559,
+          0.843
         ],
         "precision_at_10%": [
-          0.725,
-          0.915
+          0.728,
+          0.919
         ]
       },
       "synthetic": {
         "accuracy": [
-          0.793,
-          0.84
+          0.803,
+          0.85
         ],
         "precision": [
-          0.702,
-          0.775
+          0.71,
+          0.786
         ],
         "recall": [
-          0.878,
-          0.93
+          0.888,
+          0.938
         ],
         "f1": [
-          0.786,
-          0.838
+          0.796,
+          0.848
         ],
         "roc_auc": [
-          0.897,
-          0.931
+          0.903,
+          0.936
         ],
         "precision_at_1%": [
-          0.031,
-          0.04
+          0.032,
+          0.043
         ],
         "precision_at_5%": [
-          0.141,
-          0.179
+          0.147,
+          0.189
         ],
         "precision_at_10%": [
-          0.257,
-          0.316
+          0.266,
+          0.329
         ]
       }
     },
@@ -203,35 +203,35 @@
       "<=50% lines seen": {
         "n": 149,
         "scam_share": 0.336,
-        "accuracy": 0.745,
-        "precision": 0.577,
-        "recall": 0.9,
-        "f1": 0.703,
-        "mean_confidence": 0.817,
-        "predicted_scam_rate": 0.523,
-        "roc_auc": 0.903
+        "accuracy": 0.758,
+        "precision": 0.588,
+        "recall": 0.94,
+        "f1": 0.723,
+        "mean_confidence": 0.822,
+        "predicted_scam_rate": 0.537,
+        "roc_auc": 0.909
       },
       "51-99% lines seen": {
         "n": 713,
         "scam_share": 0.464,
-        "accuracy": 0.822,
-        "precision": 0.76,
-        "recall": 0.9,
-        "f1": 0.824,
-        "mean_confidence": 0.894,
-        "predicted_scam_rate": 0.55,
-        "roc_auc": 0.911
+        "accuracy": 0.832,
+        "precision": 0.773,
+        "recall": 0.903,
+        "f1": 0.833,
+        "mean_confidence": 0.892,
+        "predicted_scam_rate": 0.543,
+        "roc_auc": 0.916
       },
       "all lines seen in train": {
         "n": 138,
         "scam_share": 0.442,
-        "accuracy": 0.87,
-        "precision": 0.803,
-        "recall": 0.934,
-        "f1": 0.864,
-        "mean_confidence": 0.904,
-        "predicted_scam_rate": 0.514,
-        "roc_auc": 0.948
+        "accuracy": 0.877,
+        "precision": 0.806,
+        "recall": 0.951,
+        "f1": 0.872,
+        "mean_confidence": 0.908,
+        "predicted_scam_rate": 0.522,
+        "roc_auc": 0.952
       }
     }
   },
@@ -239,38 +239,38 @@
     "overall": {
       "n": 800,
       "scam_share": 0.624,
-      "accuracy": 0.87,
+      "accuracy": 0.868,
       "precision": 0.862,
-      "recall": 0.942,
-      "f1": 0.9,
-      "mean_confidence": 0.818,
-      "predicted_scam_rate": 0.681,
-      "roc_auc": 0.915
+      "recall": 0.938,
+      "f1": 0.898,
+      "mean_confidence": 0.82,
+      "predicted_scam_rate": 0.679,
+      "roc_auc": 0.918
     },
     "by_source": {
       "synthetic_shifted": {
         "n": 800,
         "scam_share": 0.624,
-        "accuracy": 0.87,
+        "accuracy": 0.868,
         "precision": 0.862,
-        "recall": 0.942,
-        "f1": 0.9,
-        "mean_confidence": 0.818,
-        "predicted_scam_rate": 0.681,
-        "roc_auc": 0.915
+        "recall": 0.938,
+        "f1": 0.898,
+        "mean_confidence": 0.82,
+        "predicted_scam_rate": 0.679,
+        "roc_auc": 0.918
       }
     },
     "by_language": {
       "en": {
         "n": 301,
         "scam_share": 0.708,
-        "accuracy": 0.874,
-        "precision": 0.882,
+        "accuracy": 0.867,
+        "precision": 0.874,
         "recall": 0.948,
-        "f1": 0.914,
-        "mean_confidence": 0.841,
-        "predicted_scam_rate": 0.761,
-        "roc_auc": 0.818
+        "f1": 0.91,
+        "mean_confidence": 0.844,
+        "predicted_scam_rate": 0.767,
+        "roc_auc": 0.823
       },
       "si": {
         "n": 32,
@@ -279,9 +279,9 @@
         "precision": 0.952,
         "recall": 0.952,
         "f1": 0.952,
-        "mean_confidence": 0.89,
+        "mean_confidence": 0.883,
         "predicted_scam_rate": 0.656,
-        "roc_auc": 0.983
+        "roc_auc": 0.978
       },
       "singlish": {
         "n": 167,
@@ -290,20 +290,20 @@
         "precision": 0.917,
         "recall": 0.957,
         "f1": 0.937,
-        "mean_confidence": 0.816,
+        "mean_confidence": 0.825,
         "predicted_scam_rate": 0.725,
-        "roc_auc": 0.949
+        "roc_auc": 0.957
       },
       "ta": {
         "n": 300,
         "scam_share": 0.497,
         "accuracy": 0.837,
-        "precision": 0.787,
-        "recall": 0.919,
-        "f1": 0.848,
-        "mean_confidence": 0.787,
-        "predicted_scam_rate": 0.58,
-        "roc_auc": 0.939
+        "precision": 0.794,
+        "recall": 0.906,
+        "f1": 0.846,
+        "mean_confidence": 0.788,
+        "predicted_scam_rate": 0.567,
+        "roc_auc": 0.937
       }
     },
     "by_tactic": {
@@ -311,34 +311,34 @@
         "n": 172,
         "scam_share": 0.477,
         "accuracy": 0.802,
-        "precision": 0.726,
-        "recall": 0.939,
-        "f1": 0.819,
+        "precision": 0.722,
+        "recall": 0.951,
+        "f1": 0.821,
         "mean_confidence": 0.887,
-        "predicted_scam_rate": 0.616,
-        "roc_auc": 0.919
+        "predicted_scam_rate": 0.628,
+        "roc_auc": 0.922
       },
       "crypto_payment": {
         "n": 56,
         "scam_share": 0.786,
-        "accuracy": 0.946,
-        "precision": 0.936,
+        "accuracy": 0.929,
+        "precision": 0.917,
         "recall": 1.0,
-        "f1": 0.967,
-        "mean_confidence": 0.85,
-        "predicted_scam_rate": 0.839,
-        "roc_auc": 0.816
+        "f1": 0.957,
+        "mean_confidence": 0.856,
+        "predicted_scam_rate": 0.857,
+        "roc_auc": 0.835
       },
       "cyber_compound": {
         "n": 58,
         "scam_share": 0.845,
-        "accuracy": 0.862,
+        "accuracy": 0.828,
         "precision": 1.0,
-        "recall": 0.837,
-        "f1": 0.911,
-        "mean_confidence": 0.737,
-        "predicted_scam_rate": 0.707,
-        "roc_auc": 0.998
+        "recall": 0.796,
+        "f1": 0.886,
+        "mean_confidence": 0.736,
+        "predicted_scam_rate": 0.672,
+        "roc_auc": 0.993
       },
       "digital_id_fee": {
         "n": 49,
@@ -347,88 +347,88 @@
         "precision": 0.974,
         "recall": 0.974,
         "f1": 0.974,
-        "mean_confidence": 0.815,
+        "mean_confidence": 0.822,
         "predicted_scam_rate": 0.796,
         "roc_auc": 0.905
       },
       "military_recruit": {
         "n": 49,
         "scam_share": 0.878,
-        "accuracy": 1.0,
+        "accuracy": 0.98,
         "precision": 1.0,
-        "recall": 1.0,
-        "f1": 1.0,
-        "mean_confidence": 0.811,
-        "predicted_scam_rate": 0.878,
+        "recall": 0.977,
+        "f1": 0.988,
+        "mean_confidence": 0.814,
+        "predicted_scam_rate": 0.857,
         "roc_auc": 1.0
       },
       "qr_payment": {
         "n": 59,
         "scam_share": 0.864,
-        "accuracy": 0.949,
+        "accuracy": 0.966,
         "precision": 0.962,
-        "recall": 0.98,
-        "f1": 0.971,
-        "mean_confidence": 0.869,
-        "predicted_scam_rate": 0.881,
-        "roc_auc": 0.995
+        "recall": 1.0,
+        "f1": 0.981,
+        "mean_confidence": 0.88,
+        "predicted_scam_rate": 0.898,
+        "roc_auc": 0.998
       },
       "social_live": {
         "n": 57,
         "scam_share": 0.737,
-        "accuracy": 0.912,
-        "precision": 0.93,
-        "recall": 0.952,
-        "f1": 0.941,
-        "mean_confidence": 0.775,
-        "predicted_scam_rate": 0.754,
-        "roc_auc": 0.886
+        "accuracy": 0.93,
+        "precision": 0.932,
+        "recall": 0.976,
+        "f1": 0.953,
+        "mean_confidence": 0.783,
+        "predicted_scam_rate": 0.772,
+        "roc_auc": 0.897
       },
       "tamil": {
         "n": 300,
         "scam_share": 0.497,
         "accuracy": 0.837,
-        "precision": 0.787,
-        "recall": 0.919,
-        "f1": 0.848,
-        "mean_confidence": 0.787,
-        "predicted_scam_rate": 0.58,
-        "roc_auc": 0.939
+        "precision": 0.794,
+        "recall": 0.906,
+        "f1": 0.846,
+        "mean_confidence": 0.788,
+        "predicted_scam_rate": 0.567,
+        "roc_auc": 0.937
       }
     },
     "category_accuracy": 0.991,
     "overall_ci": {
       "accuracy": [
-        0.848,
-        0.892
-      ],
-      "precision": [
-        0.835,
+        0.844,
         0.891
       ],
+      "precision": [
+        0.834,
+        0.89
+      ],
       "recall": [
-        0.919,
-        0.961
+        0.916,
+        0.959
       ],
       "f1": [
-        0.881,
-        0.918
+        0.878,
+        0.917
       ],
       "roc_auc": [
-        0.892,
-        0.937
+        0.897,
+        0.941
       ],
       "precision_at_1%": [
         0.031,
         0.045
       ],
       "precision_at_5%": [
-        0.144,
-        0.199
+        0.142,
+        0.198
       ],
       "precision_at_10%": [
-        0.262,
-        0.344
+        0.259,
+        0.343
       ]
     },
     "base_rates": {
@@ -437,259 +437,259 @@
         "false_alarms_per_1000_offers": 246.7,
         "scams_caught_per_1000_offers": 9.4,
         "scams_missed_per_1000_offers": 0.6,
-        "false_alarms_per_scam_caught": 26.19
+        "false_alarms_per_scam_caught": 26.3
       },
       "5%": {
-        "precision": 0.166,
+        "precision": 0.165,
         "false_alarms_per_1000_offers": 236.7,
-        "scams_caught_per_1000_offers": 47.1,
-        "scams_missed_per_1000_offers": 2.9,
-        "false_alarms_per_scam_caught": 5.03
+        "scams_caught_per_1000_offers": 46.9,
+        "scams_missed_per_1000_offers": 3.1,
+        "false_alarms_per_scam_caught": 5.05
       },
       "10%": {
-        "precision": 0.296,
+        "precision": 0.295,
         "false_alarms_per_1000_offers": 224.3,
-        "scams_caught_per_1000_offers": 94.2,
-        "scams_missed_per_1000_offers": 5.8,
-        "false_alarms_per_scam_caught": 2.38
+        "scams_caught_per_1000_offers": 93.8,
+        "scams_missed_per_1000_offers": 6.2,
+        "false_alarms_per_scam_caught": 2.39
       }
     },
     "by_source_ci": {
       "synthetic_shifted": {
         "accuracy": [
-          0.848,
-          0.892
-        ],
-        "precision": [
-          0.835,
+          0.844,
           0.891
         ],
+        "precision": [
+          0.834,
+          0.89
+        ],
         "recall": [
-          0.919,
-          0.961
+          0.916,
+          0.959
         ],
         "f1": [
-          0.881,
-          0.918
+          0.878,
+          0.917
         ],
         "roc_auc": [
-          0.892,
-          0.937
+          0.897,
+          0.941
         ],
         "precision_at_1%": [
           0.031,
           0.045
         ],
         "precision_at_5%": [
-          0.144,
-          0.199
+          0.142,
+          0.198
         ],
         "precision_at_10%": [
-          0.262,
-          0.344
+          0.259,
+          0.343
         ]
       }
     }
   },
   "val": {
-    "n": 689,
-    "scam_share": 0.337,
-    "roc_auc": 0.997,
+    "n": 685,
+    "scam_share": 0.327,
+    "roc_auc": 0.992,
     "pr_curve": [
       {
-        "threshold": 0.0,
-        "precision": 0.337,
+        "threshold": 0.001,
+        "precision": 0.327,
         "recall": 1.0
       },
       {
-        "threshold": 0.002,
-        "precision": 0.345,
+        "threshold": 0.003,
+        "precision": 0.335,
         "recall": 1.0
       },
       {
         "threshold": 0.004,
-        "precision": 0.355,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.005,
-        "precision": 0.364,
+        "precision": 0.345,
         "recall": 1.0
       },
       {
         "threshold": 0.006,
-        "precision": 0.375,
+        "precision": 0.354,
         "recall": 1.0
       },
       {
         "threshold": 0.008,
-        "precision": 0.386,
+        "precision": 0.364,
+        "recall": 1.0
+      },
+      {
+        "threshold": 0.009,
+        "precision": 0.375,
         "recall": 1.0
       },
       {
         "threshold": 0.01,
-        "precision": 0.397,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.011,
-        "precision": 0.41,
+        "precision": 0.386,
         "recall": 1.0
       },
       {
         "threshold": 0.012,
-        "precision": 0.423,
+        "precision": 0.398,
         "recall": 1.0
       },
       {
         "threshold": 0.014,
-        "precision": 0.437,
+        "precision": 0.411,
         "recall": 1.0
       },
       {
-        "threshold": 0.016,
-        "precision": 0.452,
+        "threshold": 0.015,
+        "precision": 0.424,
         "recall": 1.0
       },
       {
-        "threshold": 0.018,
-        "precision": 0.468,
+        "threshold": 0.017,
+        "precision": 0.439,
         "recall": 1.0
       },
       {
-        "threshold": 0.02,
-        "precision": 0.485,
+        "threshold": 0.019,
+        "precision": 0.454,
         "recall": 1.0
       },
       {
         "threshold": 0.022,
-        "precision": 0.504,
+        "precision": 0.472,
         "recall": 1.0
       },
       {
         "threshold": 0.025,
-        "precision": 0.524,
+        "precision": 0.489,
         "recall": 1.0
       },
       {
         "threshold": 0.029,
-        "precision": 0.546,
+        "precision": 0.509,
         "recall": 1.0
       },
       {
-        "threshold": 0.033,
-        "precision": 0.569,
+        "threshold": 0.034,
+        "precision": 0.53,
         "recall": 1.0
       },
       {
-        "threshold": 0.037,
-        "precision": 0.595,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.049,
-        "precision": 0.624,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.062,
-        "precision": 0.654,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.071,
-        "precision": 0.688,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.084,
-        "precision": 0.725,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.101,
-        "precision": 0.768,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.122,
-        "precision": 0.82,
-        "recall": 1.0
-      },
-      {
-        "threshold": 0.155,
-        "precision": 0.868,
+        "threshold": 0.04,
+        "precision": 0.551,
         "recall": 0.996
       },
       {
-        "threshold": 0.257,
-        "precision": 0.923,
+        "threshold": 0.044,
+        "precision": 0.572,
+        "recall": 0.991
+      },
+      {
+        "threshold": 0.05,
+        "precision": 0.597,
         "recall": 0.987
       },
       {
-        "threshold": 0.337,
-        "precision": 0.961,
-        "recall": 0.953
+        "threshold": 0.059,
+        "precision": 0.626,
+        "recall": 0.987
       },
       {
-        "threshold": 0.556,
-        "precision": 0.995,
-        "recall": 0.914
+        "threshold": 0.069,
+        "precision": 0.66,
+        "recall": 0.987
       },
       {
-        "threshold": 0.819,
+        "threshold": 0.08,
+        "precision": 0.695,
+        "recall": 0.987
+      },
+      {
+        "threshold": 0.096,
+        "precision": 0.733,
+        "recall": 0.982
+      },
+      {
+        "threshold": 0.118,
+        "precision": 0.777,
+        "recall": 0.982
+      },
+      {
+        "threshold": 0.143,
+        "precision": 0.826,
+        "recall": 0.978
+      },
+      {
+        "threshold": 0.207,
+        "precision": 0.879,
+        "recall": 0.969
+      },
+      {
+        "threshold": 0.304,
+        "precision": 0.939,
+        "recall": 0.96
+      },
+      {
+        "threshold": 0.568,
+        "precision": 0.981,
+        "recall": 0.929
+      },
+      {
+        "threshold": 0.851,
         "precision": 1.0,
-        "recall": 0.841
+        "recall": 0.866
       },
       {
-        "threshold": 0.942,
+        "threshold": 0.919,
         "precision": 1.0,
-        "recall": 0.767
+        "recall": 0.79
       },
       {
-        "threshold": 0.974,
+        "threshold": 0.958,
         "precision": 1.0,
-        "recall": 0.69
+        "recall": 0.71
       },
       {
-        "threshold": 0.982,
+        "threshold": 0.973,
         "precision": 1.0,
-        "recall": 0.612
+        "recall": 0.634
       },
       {
-        "threshold": 0.986,
+        "threshold": 0.981,
         "precision": 1.0,
-        "recall": 0.539
+        "recall": 0.554
       },
       {
-        "threshold": 0.99,
+        "threshold": 0.987,
         "precision": 1.0,
-        "recall": 0.461
+        "recall": 0.478
       },
       {
-        "threshold": 0.993,
+        "threshold": 0.992,
         "precision": 1.0,
-        "recall": 0.388
+        "recall": 0.397
       },
       {
-        "threshold": 0.995,
+        "threshold": 0.994,
         "precision": 1.0,
-        "recall": 0.31
+        "recall": 0.321
       },
       {
         "threshold": 0.997,
         "precision": 1.0,
-        "recall": 0.233
+        "recall": 0.241
       },
       {
         "threshold": 0.998,
         "precision": 1.0,
-        "recall": 0.159
+        "recall": 0.165
       },
       {
         "threshold": 0.999,
         "precision": 1.0,
-        "recall": 0.082
+        "recall": 0.085
       },
       {
         "threshold": 1.0,
@@ -706,156 +706,156 @@
     },
     "recall_at_least_0.9": {
       "val": {
-        "threshold": 0.643,
+        "threshold": 0.771,
         "precision": 1.0,
-        "recall": 0.901,
+        "recall": 0.902,
         "f1": 0.948
       },
       "test": {
-        "threshold": 0.643,
+        "threshold": 0.771,
         "n": 1698,
         "scam_share": 0.327,
-        "accuracy": 0.869,
-        "precision": 0.793,
-        "recall": 0.813,
-        "f1": 0.802,
-        "mean_confidence": 0.896,
-        "predicted_scam_rate": 0.335,
-        "roc_auc": 0.936,
-        "fpr": 0.103,
+        "accuracy": 0.872,
+        "precision": 0.835,
+        "recall": 0.759,
+        "f1": 0.795,
+        "mean_confidence": 0.897,
+        "predicted_scam_rate": 0.297,
+        "roc_auc": 0.94,
+        "fpr": 0.073,
         "ci95": {
           "accuracy": [
-            0.852,
-            0.886
+            0.857,
+            0.888
           ],
           "precision": [
-            0.76,
-            0.825
+            0.804,
+            0.867
           ],
           "recall": [
-            0.778,
-            0.846
+            0.721,
+            0.795
           ],
           "f1": [
-            0.776,
-            0.827
+            0.767,
+            0.821
           ],
           "roc_auc": [
-            0.924,
-            0.947
+            0.929,
+            0.95
           ],
           "precision_at_1%": [
-            0.063,
-            0.087
+            0.079,
+            0.117
           ],
           "precision_at_5%": [
-            0.259,
-            0.333
+            0.31,
+            0.409
           ],
           "precision_at_10%": [
-            0.425,
-            0.513
+            0.486,
+            0.594
           ]
         },
         "base_rates": {
           "1%": {
-            "precision": 0.074,
-            "false_alarms_per_1000_offers": 102.2,
-            "scams_caught_per_1000_offers": 8.1,
-            "scams_missed_per_1000_offers": 1.9,
-            "false_alarms_per_scam_caught": 12.58
+            "precision": 0.095,
+            "false_alarms_per_1000_offers": 71.9,
+            "scams_caught_per_1000_offers": 7.6,
+            "scams_missed_per_1000_offers": 2.4,
+            "false_alarms_per_scam_caught": 9.48
           },
           "5%": {
-            "precision": 0.293,
-            "false_alarms_per_1000_offers": 98.1,
-            "scams_caught_per_1000_offers": 40.6,
-            "scams_missed_per_1000_offers": 9.4,
-            "false_alarms_per_scam_caught": 2.41
+            "precision": 0.355,
+            "false_alarms_per_1000_offers": 69.0,
+            "scams_caught_per_1000_offers": 37.9,
+            "scams_missed_per_1000_offers": 12.1,
+            "false_alarms_per_scam_caught": 1.82
           },
           "10%": {
-            "precision": 0.467,
-            "false_alarms_per_1000_offers": 92.9,
-            "scams_caught_per_1000_offers": 81.3,
-            "scams_missed_per_1000_offers": 18.7,
-            "false_alarms_per_scam_caught": 1.14
+            "precision": 0.537,
+            "false_alarms_per_1000_offers": 65.4,
+            "scams_caught_per_1000_offers": 75.9,
+            "scams_missed_per_1000_offers": 24.1,
+            "false_alarms_per_scam_caught": 0.86
           }
         }
       }
     },
     "best_f1": {
       "val": {
-        "threshold": 0.328,
-        "precision": 0.961,
-        "recall": 0.961,
-        "f1": 0.961
+        "threshold": 0.419,
+        "precision": 0.968,
+        "recall": 0.946,
+        "f1": 0.957
       },
       "test": {
-        "threshold": 0.328,
+        "threshold": 0.419,
         "n": 1698,
         "scam_share": 0.327,
-        "accuracy": 0.838,
-        "precision": 0.695,
-        "recall": 0.899,
-        "f1": 0.784,
-        "mean_confidence": 0.896,
-        "predicted_scam_rate": 0.423,
-        "roc_auc": 0.936,
-        "fpr": 0.192,
+        "accuracy": 0.861,
+        "precision": 0.743,
+        "recall": 0.879,
+        "f1": 0.805,
+        "mean_confidence": 0.897,
+        "predicted_scam_rate": 0.387,
+        "roc_auc": 0.94,
+        "fpr": 0.148,
         "ci95": {
           "accuracy": [
-            0.82,
-            0.856
+            0.845,
+            0.878
           ],
           "precision": [
-            0.661,
-            0.726
+            0.712,
+            0.774
           ],
           "recall": [
-            0.873,
-            0.923
+            0.851,
+            0.906
           ],
           "f1": [
-            0.759,
-            0.809
+            0.783,
+            0.828
           ],
           "roc_auc": [
-            0.924,
-            0.947
+            0.929,
+            0.95
           ],
           "precision_at_1%": [
-            0.04,
-            0.051
+            0.05,
+            0.065
           ],
           "precision_at_5%": [
-            0.18,
-            0.219
+            0.215,
+            0.266
           ],
           "precision_at_10%": [
-            0.316,
-            0.372
+            0.367,
+            0.433
           ]
         },
         "base_rates": {
           "1%": {
-            "precision": 0.045,
-            "false_alarms_per_1000_offers": 189.7,
-            "scams_caught_per_1000_offers": 9.0,
-            "scams_missed_per_1000_offers": 1.0,
-            "false_alarms_per_scam_caught": 21.1
+            "precision": 0.057,
+            "false_alarms_per_1000_offers": 146.4,
+            "scams_caught_per_1000_offers": 8.8,
+            "scams_missed_per_1000_offers": 1.2,
+            "false_alarms_per_scam_caught": 16.65
           },
           "5%": {
-            "precision": 0.198,
-            "false_alarms_per_1000_offers": 182.0,
-            "scams_caught_per_1000_offers": 45.0,
-            "scams_missed_per_1000_offers": 5.0,
-            "false_alarms_per_scam_caught": 4.05
+            "precision": 0.238,
+            "false_alarms_per_1000_offers": 140.5,
+            "scams_caught_per_1000_offers": 44.0,
+            "scams_missed_per_1000_offers": 6.0,
+            "false_alarms_per_scam_caught": 3.19
           },
           "10%": {
-            "precision": 0.343,
-            "false_alarms_per_1000_offers": 172.4,
-            "scams_caught_per_1000_offers": 89.9,
-            "scams_missed_per_1000_offers": 10.1,
-            "false_alarms_per_scam_caught": 1.92
+            "precision": 0.398,
+            "false_alarms_per_1000_offers": 133.1,
+            "scams_caught_per_1000_offers": 87.9,
+            "scams_missed_per_1000_offers": 12.1,
+            "false_alarms_per_scam_caught": 1.51
           }
         }
       }
@@ -864,69 +864,69 @@
       "threshold": 0.4,
       "n": 1698,
       "scam_share": 0.327,
-      "accuracy": 0.849,
-      "precision": 0.723,
-      "recall": 0.872,
-      "f1": 0.791,
-      "mean_confidence": 0.896,
-      "predicted_scam_rate": 0.394,
-      "roc_auc": 0.936,
-      "fpr": 0.162,
+      "accuracy": 0.854,
+      "precision": 0.728,
+      "recall": 0.883,
+      "f1": 0.798,
+      "mean_confidence": 0.897,
+      "predicted_scam_rate": 0.396,
+      "roc_auc": 0.94,
+      "fpr": 0.16,
       "ci95": {
         "accuracy": [
-          0.83,
-          0.866
+          0.837,
+          0.87
         ],
         "precision": [
-          0.689,
-          0.754
+          0.696,
+          0.76
         ],
         "recall": [
-          0.842,
-          0.899
+          0.855,
+          0.91
         ],
         "f1": [
-          0.766,
-          0.814
+          0.775,
+          0.822
         ],
         "roc_auc": [
-          0.924,
-          0.947
+          0.929,
+          0.95
         ],
         "precision_at_1%": [
-          0.045,
-          0.059
+          0.046,
+          0.06
         ],
         "precision_at_5%": [
-          0.198,
-          0.245
+          0.203,
+          0.25
         ],
         "precision_at_10%": [
-          0.343,
-          0.407
+          0.349,
+          0.413
         ]
       },
       "base_rates": {
         "1%": {
-          "precision": 0.052,
-          "false_alarms_per_1000_offers": 160.2,
-          "scams_caught_per_1000_offers": 8.7,
-          "scams_missed_per_1000_offers": 1.3,
-          "false_alarms_per_scam_caught": 18.37
+          "precision": 0.053,
+          "false_alarms_per_1000_offers": 158.5,
+          "scams_caught_per_1000_offers": 8.8,
+          "scams_missed_per_1000_offers": 1.2,
+          "false_alarms_per_scam_caught": 17.95
         },
         "5%": {
-          "precision": 0.221,
-          "false_alarms_per_1000_offers": 153.8,
-          "scams_caught_per_1000_offers": 43.6,
-          "scams_missed_per_1000_offers": 6.4,
-          "false_alarms_per_scam_caught": 3.53
+          "precision": 0.225,
+          "false_alarms_per_1000_offers": 152.1,
+          "scams_caught_per_1000_offers": 44.1,
+          "scams_missed_per_1000_offers": 5.9,
+          "false_alarms_per_scam_caught": 3.45
         },
         "10%": {
-          "precision": 0.374,
-          "false_alarms_per_1000_offers": 145.7,
-          "scams_caught_per_1000_offers": 87.2,
-          "scams_missed_per_1000_offers": 12.8,
-          "false_alarms_per_scam_caught": 1.67
+          "precision": 0.38,
+          "false_alarms_per_1000_offers": 144.1,
+          "scams_caught_per_1000_offers": 88.3,
+          "scams_missed_per_1000_offers": 11.7,
+          "false_alarms_per_scam_caught": 1.63
         }
       }
     },
@@ -934,34 +934,34 @@
       "threshold": 0.7,
       "n": 1698,
       "scam_share": 0.327,
-      "accuracy": 0.875,
-      "precision": 0.814,
-      "recall": 0.798,
-      "f1": 0.806,
-      "mean_confidence": 0.896,
-      "predicted_scam_rate": 0.32,
-      "roc_auc": 0.936,
+      "accuracy": 0.877,
+      "precision": 0.816,
+      "recall": 0.805,
+      "f1": 0.811,
+      "mean_confidence": 0.897,
+      "predicted_scam_rate": 0.323,
+      "roc_auc": 0.94,
       "fpr": 0.088,
       "ci95": {
         "accuracy": [
-          0.859,
-          0.891
+          0.86,
+          0.893
         ],
         "precision": [
-          0.782,
-          0.846
+          0.784,
+          0.848
         ],
         "recall": [
-          0.764,
-          0.833
+          0.771,
+          0.839
         ],
         "f1": [
-          0.779,
-          0.832
+          0.785,
+          0.836
         ],
         "roc_auc": [
-          0.924,
-          0.947
+          0.929,
+          0.95
         ],
         "precision_at_1%": [
           0.071,
@@ -980,23 +980,23 @@
         "1%": {
           "precision": 0.084,
           "false_alarms_per_1000_offers": 87.5,
-          "scams_caught_per_1000_offers": 8.0,
-          "scams_missed_per_1000_offers": 2.0,
-          "false_alarms_per_scam_caught": 10.96
+          "scams_caught_per_1000_offers": 8.1,
+          "scams_missed_per_1000_offers": 1.9,
+          "false_alarms_per_scam_caught": 10.86
         },
         "5%": {
-          "precision": 0.322,
+          "precision": 0.324,
           "false_alarms_per_1000_offers": 83.9,
-          "scams_caught_per_1000_offers": 39.9,
-          "scams_missed_per_1000_offers": 10.1,
-          "false_alarms_per_scam_caught": 2.1
+          "scams_caught_per_1000_offers": 40.3,
+          "scams_missed_per_1000_offers": 9.7,
+          "false_alarms_per_scam_caught": 2.08
         },
         "10%": {
-          "precision": 0.501,
+          "precision": 0.503,
           "false_alarms_per_1000_offers": 79.5,
-          "scams_caught_per_1000_offers": 79.8,
-          "scams_missed_per_1000_offers": 20.2,
-          "false_alarms_per_scam_caught": 1.0
+          "scams_caught_per_1000_offers": 80.5,
+          "scams_missed_per_1000_offers": 19.5,
+          "false_alarms_per_scam_caught": 0.99
         }
       }
     }
@@ -1008,209 +1008,209 @@
       "threshold": 0.5,
       "n": 60,
       "scam_share": 0.5,
+      "accuracy": 0.75,
+      "precision": 0.727,
+      "recall": 0.8,
+      "f1": 0.762,
+      "mean_confidence": 0.74,
+      "predicted_scam_rate": 0.55,
+      "roc_auc": 0.791,
+      "fpr": 0.3,
+      "ci95": {
+        "accuracy": [
+          0.633,
+          0.85
+        ],
+        "precision": [
+          0.556,
+          0.867
+        ],
+        "recall": [
+          0.647,
+          0.933
+        ],
+        "f1": [
+          0.633,
+          0.868
+        ],
+        "roc_auc": [
+          0.667,
+          0.897
+        ],
+        "precision_at_1%": [
+          0.016,
+          0.051
+        ],
+        "precision_at_5%": [
+          0.078,
+          0.219
+        ],
+        "precision_at_10%": [
+          0.151,
+          0.372
+        ]
+      },
+      "base_rates": {
+        "1%": {
+          "precision": 0.026,
+          "false_alarms_per_1000_offers": 297.0,
+          "scams_caught_per_1000_offers": 8.0,
+          "scams_missed_per_1000_offers": 2.0,
+          "false_alarms_per_scam_caught": 37.12
+        },
+        "5%": {
+          "precision": 0.123,
+          "false_alarms_per_1000_offers": 285.0,
+          "scams_caught_per_1000_offers": 40.0,
+          "scams_missed_per_1000_offers": 10.0,
+          "false_alarms_per_scam_caught": 7.12
+        },
+        "10%": {
+          "precision": 0.229,
+          "false_alarms_per_1000_offers": 270.0,
+          "scams_caught_per_1000_offers": 80.0,
+          "scams_missed_per_1000_offers": 20.0,
+          "false_alarms_per_scam_caught": 3.37
+        }
+      }
+    },
+    "at_recall_at_least_0.9": {
+      "threshold": 0.771,
+      "n": 60,
+      "scam_share": 0.5,
       "accuracy": 0.667,
-      "precision": 0.609,
-      "recall": 0.933,
-      "f1": 0.737,
-      "mean_confidence": 0.75,
-      "predicted_scam_rate": 0.767,
-      "roc_auc": 0.784,
-      "fpr": 0.6,
+      "precision": 0.857,
+      "recall": 0.4,
+      "f1": 0.545,
+      "mean_confidence": 0.74,
+      "predicted_scam_rate": 0.233,
+      "roc_auc": 0.791,
+      "fpr": 0.067,
       "ci95": {
         "accuracy": [
           0.55,
           0.783
         ],
         "precision": [
-          0.469,
-          0.75
-        ],
-        "recall": [
-          0.828,
+          0.667,
           1.0
         ],
-        "f1": [
-          0.618,
-          0.833
-        ],
-        "roc_auc": [
-          0.656,
-          0.891
-        ],
-        "precision_at_1%": [
-          0.012,
-          0.022
-        ],
-        "precision_at_5%": [
-          0.058,
-          0.104
-        ],
-        "precision_at_10%": [
-          0.115,
-          0.197
-        ]
-      },
-      "base_rates": {
-        "1%": {
-          "precision": 0.015,
-          "false_alarms_per_1000_offers": 594.0,
-          "scams_caught_per_1000_offers": 9.3,
-          "scams_missed_per_1000_offers": 0.7,
-          "false_alarms_per_scam_caught": 63.64
-        },
-        "5%": {
-          "precision": 0.076,
-          "false_alarms_per_1000_offers": 570.0,
-          "scams_caught_per_1000_offers": 46.7,
-          "scams_missed_per_1000_offers": 3.3,
-          "false_alarms_per_scam_caught": 12.21
-        },
-        "10%": {
-          "precision": 0.147,
-          "false_alarms_per_1000_offers": 540.0,
-          "scams_caught_per_1000_offers": 93.3,
-          "scams_missed_per_1000_offers": 6.7,
-          "false_alarms_per_scam_caught": 5.79
-        }
-      }
-    },
-    "at_recall_at_least_0.9": {
-      "threshold": 0.643,
-      "n": 60,
-      "scam_share": 0.5,
-      "accuracy": 0.7,
-      "precision": 0.688,
-      "recall": 0.733,
-      "f1": 0.71,
-      "mean_confidence": 0.75,
-      "predicted_scam_rate": 0.533,
-      "roc_auc": 0.784,
-      "fpr": 0.333,
-      "ci95": {
-        "accuracy": [
-          0.583,
-          0.8
-        ],
-        "precision": [
-          0.516,
-          0.844
-        ],
         "recall": [
-          0.571,
-          0.882
+          0.238,
+          0.571
         ],
         "f1": [
-          0.562,
-          0.829
+          0.353,
+          0.698
         ],
         "roc_auc": [
-          0.656,
-          0.891
+          0.667,
+          0.897
         ],
         "precision_at_1%": [
-          0.013,
-          0.043
+          0.021,
+          1.0
         ],
         "precision_at_5%": [
-          0.066,
-          0.188
+          0.1,
+          1.0
         ],
         "precision_at_10%": [
-          0.13,
-          0.328
+          0.189,
+          1.0
         ]
       },
       "base_rates": {
         "1%": {
-          "precision": 0.022,
-          "false_alarms_per_1000_offers": 330.0,
-          "scams_caught_per_1000_offers": 7.3,
-          "scams_missed_per_1000_offers": 2.7,
-          "false_alarms_per_scam_caught": 45.0
+          "precision": 0.057,
+          "false_alarms_per_1000_offers": 66.0,
+          "scams_caught_per_1000_offers": 4.0,
+          "scams_missed_per_1000_offers": 6.0,
+          "false_alarms_per_scam_caught": 16.5
         },
         "5%": {
-          "precision": 0.104,
-          "false_alarms_per_1000_offers": 316.7,
-          "scams_caught_per_1000_offers": 36.7,
-          "scams_missed_per_1000_offers": 13.3,
-          "false_alarms_per_scam_caught": 8.64
+          "precision": 0.24,
+          "false_alarms_per_1000_offers": 63.3,
+          "scams_caught_per_1000_offers": 20.0,
+          "scams_missed_per_1000_offers": 30.0,
+          "false_alarms_per_scam_caught": 3.17
         },
         "10%": {
-          "precision": 0.196,
-          "false_alarms_per_1000_offers": 300.0,
-          "scams_caught_per_1000_offers": 73.3,
-          "scams_missed_per_1000_offers": 26.7,
-          "false_alarms_per_scam_caught": 4.09
+          "precision": 0.4,
+          "false_alarms_per_1000_offers": 60.0,
+          "scams_caught_per_1000_offers": 40.0,
+          "scams_missed_per_1000_offers": 60.0,
+          "false_alarms_per_scam_caught": 1.5
         }
       }
     },
     "at_best_f1": {
-      "threshold": 0.328,
+      "threshold": 0.419,
       "n": 60,
       "scam_share": 0.5,
-      "accuracy": 0.6,
-      "precision": 0.56,
-      "recall": 0.933,
-      "f1": 0.7,
-      "mean_confidence": 0.75,
-      "predicted_scam_rate": 0.833,
-      "roc_auc": 0.784,
-      "fpr": 0.733,
+      "accuracy": 0.717,
+      "precision": 0.676,
+      "recall": 0.833,
+      "f1": 0.746,
+      "mean_confidence": 0.74,
+      "predicted_scam_rate": 0.617,
+      "roc_auc": 0.791,
+      "fpr": 0.4,
       "ci95": {
         "accuracy": [
-          0.483,
-          0.717
+          0.6,
+          0.817
         ],
         "precision": [
-          0.422,
-          0.696
+          0.512,
+          0.829
         ],
         "recall": [
-          0.828,
-          1.0
+          0.692,
+          0.964
         ],
         "f1": [
-          0.575,
-          0.804
+          0.615,
+          0.849
         ],
         "roc_auc": [
-          0.656,
-          0.891
+          0.667,
+          0.897
         ],
         "precision_at_1%": [
-          0.01,
-          0.017
+          0.014,
+          0.036
         ],
         "precision_at_5%": [
-          0.051,
-          0.081
+          0.067,
+          0.161
         ],
         "precision_at_10%": [
-          0.101,
-          0.156
+          0.133,
+          0.288
         ]
       },
       "base_rates": {
         "1%": {
-          "precision": 0.013,
-          "false_alarms_per_1000_offers": 726.0,
-          "scams_caught_per_1000_offers": 9.3,
-          "scams_missed_per_1000_offers": 0.7,
-          "false_alarms_per_scam_caught": 77.79
+          "precision": 0.021,
+          "false_alarms_per_1000_offers": 396.0,
+          "scams_caught_per_1000_offers": 8.3,
+          "scams_missed_per_1000_offers": 1.7,
+          "false_alarms_per_scam_caught": 47.52
         },
         "5%": {
-          "precision": 0.063,
-          "false_alarms_per_1000_offers": 696.7,
-          "scams_caught_per_1000_offers": 46.7,
-          "scams_missed_per_1000_offers": 3.3,
-          "false_alarms_per_scam_caught": 14.93
+          "precision": 0.099,
+          "false_alarms_per_1000_offers": 380.0,
+          "scams_caught_per_1000_offers": 41.7,
+          "scams_missed_per_1000_offers": 8.3,
+          "false_alarms_per_scam_caught": 9.12
         },
         "10%": {
-          "precision": 0.124,
-          "false_alarms_per_1000_offers": 660.0,
-          "scams_caught_per_1000_offers": 93.3,
-          "scams_missed_per_1000_offers": 6.7,
-          "false_alarms_per_scam_caught": 7.07
+          "precision": 0.188,
+          "false_alarms_per_1000_offers": 360.0,
+          "scams_caught_per_1000_offers": 83.3,
+          "scams_missed_per_1000_offers": 16.7,
+          "false_alarms_per_scam_caught": 4.32
         }
       }
     },
@@ -1218,34 +1218,34 @@
       "foreign_job": {
         "n": 30,
         "scam_share": 0.567,
-        "accuracy": 0.6,
-        "precision": 0.593,
-        "recall": 0.941,
-        "f1": 0.727,
-        "mean_confidence": 0.714,
-        "predicted_scam_rate": 0.9,
-        "roc_auc": 0.796
+        "accuracy": 0.733,
+        "precision": 0.765,
+        "recall": 0.765,
+        "f1": 0.765,
+        "mean_confidence": 0.686,
+        "predicted_scam_rate": 0.567,
+        "roc_auc": 0.747
       },
       "local_job": {
         "n": 21,
         "scam_share": 0.381,
-        "accuracy": 0.619,
-        "precision": 0.5,
+        "accuracy": 0.714,
+        "precision": 0.583,
         "recall": 0.875,
-        "f1": 0.636,
-        "mean_confidence": 0.794,
-        "predicted_scam_rate": 0.667,
-        "roc_auc": 0.76
+        "f1": 0.7,
+        "mean_confidence": 0.809,
+        "predicted_scam_rate": 0.571,
+        "roc_auc": 0.798
       },
       "student_visa": {
         "n": 4,
         "scam_share": 0.5,
-        "accuracy": 1.0,
+        "accuracy": 0.75,
         "precision": 1.0,
-        "recall": 1.0,
-        "f1": 1.0,
-        "mean_confidence": 0.798,
-        "predicted_scam_rate": 0.5,
+        "recall": 0.5,
+        "f1": 0.667,
+        "mean_confidence": 0.806,
+        "predicted_scam_rate": 0.25,
         "roc_auc": 1.0
       },
       "visa_pr": {
@@ -1255,7 +1255,7 @@
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0,
-        "mean_confidence": 0.737,
+        "mean_confidence": 0.723,
         "predicted_scam_rate": 0.6,
         "roc_auc": 1.0
       }
@@ -1264,23 +1264,23 @@
       "en": {
         "n": 39,
         "scam_share": 0.513,
-        "accuracy": 0.641,
-        "precision": 0.6,
-        "recall": 0.9,
-        "f1": 0.72,
-        "mean_confidence": 0.731,
-        "predicted_scam_rate": 0.769,
-        "roc_auc": 0.755
+        "accuracy": 0.769,
+        "precision": 0.762,
+        "recall": 0.8,
+        "f1": 0.78,
+        "mean_confidence": 0.709,
+        "predicted_scam_rate": 0.538,
+        "roc_auc": 0.795
       },
       "mixed": {
         "n": 3,
         "scam_share": 0.333,
-        "accuracy": 0.333,
-        "precision": 0.333,
+        "accuracy": 0.667,
+        "precision": 0.5,
         "recall": 1.0,
-        "f1": 0.5,
-        "mean_confidence": 0.836,
-        "predicted_scam_rate": 1.0,
+        "f1": 0.667,
+        "mean_confidence": 0.843,
+        "predicted_scam_rate": 0.667,
         "roc_auc": 1.0
       },
       "si": {
@@ -1290,9 +1290,9 @@
         "precision": 0.571,
         "recall": 1.0,
         "f1": 0.727,
-        "mean_confidence": 0.778,
+        "mean_confidence": 0.777,
         "predicted_scam_rate": 0.7,
-        "roc_auc": 0.917
+        "roc_auc": 0.875
       },
       "singlish": {
         "n": 3,
@@ -1301,19 +1301,19 @@
         "precision": 1.0,
         "recall": 1.0,
         "f1": 1.0,
-        "mean_confidence": 0.878,
+        "mean_confidence": 0.811,
         "predicted_scam_rate": 1.0
       },
       "ta": {
         "n": 5,
         "scam_share": 0.4,
-        "accuracy": 0.8,
-        "precision": 0.667,
-        "recall": 1.0,
-        "f1": 0.8,
-        "mean_confidence": 0.708,
-        "predicted_scam_rate": 0.6,
-        "roc_auc": 1.0
+        "accuracy": 0.6,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "mean_confidence": 0.806,
+        "predicted_scam_rate": 0.0,
+        "roc_auc": 0.667
       }
     }
   },
@@ -1323,48 +1323,48 @@
         "test_emscad": {
           "n": 698,
           "scam_share": 0.162,
-          "accuracy": 0.933,
-          "precision": 0.851,
-          "recall": 0.708,
-          "f1": 0.773,
-          "mean_confidence": 0.905,
-          "predicted_scam_rate": 0.135,
-          "roc_auc": 0.967
+          "accuracy": 0.934,
+          "precision": 0.853,
+          "recall": 0.717,
+          "f1": 0.779,
+          "mean_confidence": 0.906,
+          "predicted_scam_rate": 0.136,
+          "roc_auc": 0.966
         },
         "test_synthetic": {
           "n": 1000,
           "scam_share": 0.442,
-          "accuracy": 0.586,
-          "precision": 0.583,
-          "recall": 0.222,
-          "f1": 0.321,
-          "mean_confidence": 0.683,
-          "predicted_scam_rate": 0.168,
-          "roc_auc": 0.592
+          "accuracy": 0.581,
+          "precision": 0.545,
+          "recall": 0.312,
+          "f1": 0.397,
+          "mean_confidence": 0.659,
+          "predicted_scam_rate": 0.253,
+          "roc_auc": 0.616
         }
       },
       "train_synthetic_only": {
         "test_synthetic": {
           "n": 1000,
           "scam_share": 0.442,
-          "accuracy": 0.845,
-          "precision": 0.775,
+          "accuracy": 0.843,
+          "precision": 0.772,
           "recall": 0.914,
-          "f1": 0.839,
+          "f1": 0.837,
           "mean_confidence": 0.888,
-          "predicted_scam_rate": 0.521,
-          "roc_auc": 0.924
+          "predicted_scam_rate": 0.523,
+          "roc_auc": 0.925
         },
         "test_emscad": {
           "n": 698,
           "scam_share": 0.162,
-          "accuracy": 0.176,
+          "accuracy": 0.175,
           "precision": 0.162,
           "recall": 0.982,
-          "f1": 0.279,
-          "mean_confidence": 0.848,
-          "predicted_scam_rate": 0.98,
-          "roc_auc": 0.522
+          "f1": 0.278,
+          "mean_confidence": 0.855,
+          "predicted_scam_rate": 0.981,
+          "roc_auc": 0.518
         }
       },
       "train_both (main model)": {
@@ -1375,20 +1375,20 @@
           "precision": 0.887,
           "recall": 0.628,
           "f1": 0.736,
-          "mean_confidence": 0.914,
+          "mean_confidence": 0.916,
           "predicted_scam_rate": 0.115,
-          "roc_auc": 0.962
+          "roc_auc": 0.961
         },
         "test_synthetic": {
           "n": 1000,
           "scam_share": 0.442,
-          "accuracy": 0.817,
-          "precision": 0.739,
-          "recall": 0.905,
-          "f1": 0.814,
+          "accuracy": 0.827,
+          "precision": 0.75,
+          "recall": 0.914,
+          "f1": 0.824,
           "mean_confidence": 0.884,
-          "predicted_scam_rate": 0.541,
-          "roc_auc": 0.914
+          "predicted_scam_rate": 0.539,
+          "roc_auc": 0.92
         }
       }
     },
@@ -1399,13 +1399,13 @@
         "overall": {
           "n": 1698,
           "scam_share": 0.327,
-          "accuracy": 0.862,
-          "precision": 0.758,
-          "recall": 0.849,
-          "f1": 0.801,
-          "mean_confidence": 0.896,
-          "predicted_scam_rate": 0.366,
-          "roc_auc": 0.936
+          "accuracy": 0.868,
+          "precision": 0.767,
+          "recall": 0.856,
+          "f1": 0.809,
+          "mean_confidence": 0.897,
+          "predicted_scam_rate": 0.365,
+          "roc_auc": 0.94
         },
         "by_source": {
           "emscad": {
@@ -1415,20 +1415,20 @@
             "precision": 0.887,
             "recall": 0.628,
             "f1": 0.736,
-            "mean_confidence": 0.914,
+            "mean_confidence": 0.916,
             "predicted_scam_rate": 0.115,
-            "roc_auc": 0.962
+            "roc_auc": 0.961
           },
           "synthetic": {
             "n": 1000,
             "scam_share": 0.442,
-            "accuracy": 0.817,
-            "precision": 0.739,
-            "recall": 0.905,
-            "f1": 0.814,
+            "accuracy": 0.827,
+            "precision": 0.75,
+            "recall": 0.914,
+            "f1": 0.824,
             "mean_confidence": 0.884,
-            "predicted_scam_rate": 0.541,
-            "roc_auc": 0.914
+            "predicted_scam_rate": 0.539,
+            "roc_auc": 0.92
           }
         }
       },
@@ -1436,36 +1436,36 @@
         "overall": {
           "n": 1698,
           "scam_share": 0.327,
-          "accuracy": 0.857,
-          "precision": 0.76,
-          "recall": 0.825,
-          "f1": 0.791,
-          "mean_confidence": 0.891,
-          "predicted_scam_rate": 0.355,
+          "accuracy": 0.86,
+          "precision": 0.777,
+          "recall": 0.804,
+          "f1": 0.79,
+          "mean_confidence": 0.89,
+          "predicted_scam_rate": 0.338,
           "roc_auc": 0.925
         },
         "by_source": {
           "emscad": {
             "n": 698,
             "scam_share": 0.162,
-            "accuracy": 0.928,
-            "precision": 0.899,
+            "accuracy": 0.927,
+            "precision": 0.887,
             "recall": 0.628,
-            "f1": 0.74,
-            "mean_confidence": 0.914,
-            "predicted_scam_rate": 0.113,
-            "roc_auc": 0.962
+            "f1": 0.736,
+            "mean_confidence": 0.916,
+            "predicted_scam_rate": 0.115,
+            "roc_auc": 0.96
           },
           "synthetic": {
             "n": 1000,
             "scam_share": 0.442,
-            "accuracy": 0.808,
-            "precision": 0.739,
-            "recall": 0.876,
+            "accuracy": 0.814,
+            "precision": 0.759,
+            "recall": 0.848,
             "f1": 0.801,
-            "mean_confidence": 0.874,
-            "predicted_scam_rate": 0.524,
-            "roc_auc": 0.89
+            "mean_confidence": 0.873,
+            "predicted_scam_rate": 0.494,
+            "roc_auc": 0.889
           }
         }
       },
@@ -1477,30 +1477,30 @@
           "precision": 0.758,
           "recall": 0.856,
           "f1": 0.804,
-          "mean_confidence": 0.897,
+          "mean_confidence": 0.896,
           "predicted_scam_rate": 0.369,
-          "roc_auc": 0.938
+          "roc_auc": 0.934
         },
         "synthetic": {
           "n": 1000,
           "scam_share": 0.442,
-          "accuracy": 0.818,
-          "precision": 0.737,
+          "accuracy": 0.82,
+          "precision": 0.74,
           "recall": 0.914,
-          "f1": 0.816,
+          "f1": 0.818,
           "mean_confidence": 0.883,
-          "predicted_scam_rate": 0.548,
-          "roc_auc": 0.917
+          "predicted_scam_rate": 0.546,
+          "roc_auc": 0.911
         },
         "emscad": {
           "n": 698,
           "scam_share": 0.162,
-          "accuracy": 0.928,
-          "precision": 0.899,
+          "accuracy": 0.926,
+          "precision": 0.877,
           "recall": 0.628,
-          "f1": 0.74,
+          "f1": 0.732,
           "mean_confidence": 0.915,
-          "predicted_scam_rate": 0.113,
+          "predicted_scam_rate": 0.116,
           "roc_auc": 0.96
         }
       }
