@@ -70,7 +70,6 @@ LEGIT_FEE = ["the official SLBFE registration fee", "fees as published by the un
 AGENCY = ["Lanka Bright Overseas (Pvt) Ltd", "Ceylon Horizon Manpower", "Blue Lotus Foreign Employment",
           "Serendib Global Careers", "Island Star Recruiters", "Kelani Gateway Agency", "Ruhunu Pathway Consultants",
           "Pearl Coast Education", "Sigiri Migration Services", "Dewdrop Study Abroad"]
-LIC = ["9023", "9187", "9542", "9051", "9316", "9987", "9764", "9290"]
 # Each agency's own licence number (the first six match data/kb/registry_demo.csv; Island Star is suspended there).
 # Legit ads quote their own agency's licence; scams may borrow a real-looking number.
 AGENCY_LICENCE = {"Lanka Bright Overseas (Pvt) Ltd": "9023", "Ceylon Horizon Manpower": "9187",
@@ -79,6 +78,8 @@ AGENCY_LICENCE = {"Lanka Bright Overseas (Pvt) Ltd": "9023", "Ceylon Horizon Man
                   "Ruhunu Pathway Consultants": "9104", "Pearl Coast Education": "9220",
                   "Sigiri Migration Services": "9377", "Dewdrop Study Abroad": "9412"}
 LEGIT_AGENCIES = [a for a in AGENCY if a != "Island Star Recruiters"]
+# Licences a scam can borrow: only numbers legit ads also quote, so no licence number is single-class.
+LIC = [AGENCY_LICENCE[a] for a in LEGIT_AGENCIES]
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 # ---------------------------------------------------------------- phrase pools
