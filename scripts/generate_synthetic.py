@@ -48,18 +48,23 @@ SLOTS = {
     },
 }
 SCAM_SALARY = {
-    "foreign_job": ["Rs. 450,000", "Rs. 600,000", "USD 3,000", "Rs. 850,000", "QAR 9,000", "USD 4,500"],
-    "local_job": ["Rs. 5,000 per day", "Rs. 150,000 per month", "Rs. 8,000 daily", "Rs. 250,000 monthly"],
+    "foreign_job": ["Rs. 450,000", "Rs. 600,000", "USD 3,000", "Rs. 850,000", "QAR 9,000", "USD 4,500",
+                    "Rs 600k", "6 lakhs", "රු. 450,000"],
+    "local_job": ["Rs. 5,000 per day", "Rs. 150,000 per month", "Rs. 8,000 daily", "Rs. 250,000 monthly",
+                  "Rs 5k per day", "1.5 lakhs per month", "රු. 8,000 daily"],
     "student_visa": ["full scholarship", "100% scholarship", "free tuition", "Rs. 400,000 part-time income"],
     "visa_pr": ["USD 5,000 monthly", "CAD 6,000 per month", "AUD 7,500 monthly"],
 }
 LEGIT_SALARY = {
-    "foreign_job": ["QAR 1,400", "KWD 120", "AED 1,500", "SAR 1,500", "USD 1,100", "JPY 180,000", "EUR 900"],
-    "local_job": ["Rs. 55,000 + EPF/ETF", "Rs. 70,000 + EPF/ETF", "Rs. 48,000 + allowances", "Rs. 85,000 negotiable"],
+    "foreign_job": ["QAR 1,400", "KWD 120", "AED 1,500", "SAR 1,500", "USD 1,100", "JPY 180,000", "EUR 900",
+                    "Rs. 1.2 lakhs", "Rs 120k", "රු. 120,000"],
+    "local_job": ["Rs. 55,000 + EPF/ETF", "Rs. 70,000 + EPF/ETF", "Rs. 48,000 + allowances", "Rs. 85,000 negotiable",
+                  "Rs 65k + EPF/ETF", "රු. 60,000 + EPF/ETF", "0.75 lakhs + EPF"],
     "student_visa": ["partial merit scholarship", "25% tuition waiver for eligible students", "standard tuition fees"],
     "visa_pr": ["as per official points table", "subject to official assessment", "as per immigration rules"],
 }
-SCAM_FEE = ["Rs. 150,000", "Rs. 75,000", "Rs. 250,000", "Rs. 45,000", "Rs. 350,000", "Rs. 25,000", "USD 800"]
+SCAM_FEE = ["Rs. 150,000", "Rs. 75,000", "Rs. 250,000", "Rs. 45,000", "Rs. 350,000", "Rs. 25,000", "USD 800",
+            "Rs 150k", "1.5 lakhs", "රු. 75,000", "LKR 95,000", "2 lakhs"]
 LEGIT_FEE = ["the official SLBFE registration fee", "fees as published by the university",
              "the government visa fee only", "the official application fee"]
 AGENCY = ["Lanka Bright Overseas (Pvt) Ltd", "Ceylon Horizon Manpower", "Blue Lotus Foreign Employment",
