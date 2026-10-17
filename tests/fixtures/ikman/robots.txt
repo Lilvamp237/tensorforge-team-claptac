@@ -1,0 +1,14 @@
+# SYNTHETIC robots.txt for SafePassage LK tests, modelled on the pattern style ikman.lk uses.
+User-agent: SomeOtherBot
+Disallow: /
+
+User-Agent: *
+sitemap: https://example.invalid/sitemap.xml
+
+User-Agent: *
+Disallow: /*?*sort=*
+Disallow: /*?*filters=*
+Disallow: /*?*query=*
+Disallow: /*--*
+Disallow: /*/ad/*/report*
+Disallow: /en/ad/blocked-ad-test
