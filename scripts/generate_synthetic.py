@@ -83,7 +83,7 @@ DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 # ---------------------------------------------------------------- phrase pools
 # Pool layout: POOLS[lang][kind][key] -> list of templates. kind in open|offer|scam|legit|neutral|close.
-# For pools with >= 4 phrases, every 4th phrase (index % 4 == 3) is reserved for the held-out test split.
+# For pools with >= 3 phrases, every 3rd phrase (index % 3 == 2) is reserved for the held-out test split.
 POOLS = {
     "en": {
         "open": {
@@ -516,10 +516,10 @@ NEW_DESTINATIONS = {"foreign_job": ["Thailand", "Russia", "Belarus", "Georgia", 
 
 
 def _split_pool(items: list[str], split: str, rng: random.Random) -> list[str]:
-    if len(items) < 4:
+    if len(items) < 3:
         return items
-    reserved = [x for i, x in enumerate(items) if i % 4 == 3]
-    common = [x for i, x in enumerate(items) if i % 4 != 3]
+    reserved = [x for i, x in enumerate(items) if i % 3 == 2]
+    common = [x for i, x in enumerate(items) if i % 3 != 2]
     if split == "train":
         return common
     return reserved if rng.random() < 0.5 else common
