@@ -39,7 +39,8 @@ def psi(expected: dict[str, float], actual: dict[str, float]) -> float:
 
 
 def _fields(rows: list[dict]):
-    probs = np.array([r["risk"]["probability"] for r in rows], dtype=float)
+    # Drift is measured on the raw text-model score, which is what the reference was calibrated on.
+    probs = np.array([r.get("model_probability") or r["risk"]["probability"] for r in rows], dtype=float)
     langs = [r["content"]["language"] for r in rows]
     cats = [r["content"]["type"] for r in rows]
     unfamiliar = np.array([r["novelty"]["status"] == "unfamiliar_pattern" for r in rows], dtype=float)

@@ -3,7 +3,7 @@
 import uuid
 from typing import NamedTuple
 
-from . import reputation
+from . import config, reputation, trust
 from .config import MODEL_PATH, NOVELTY_THRESHOLD
 from .extract import extract_content
 from .features import describe, find_red_flags
@@ -50,7 +50,15 @@ def scan_text(text: str, source: str = "text", url: str | None = None, media: st
     # Until Person A ships a model, fall back to a crude red-flag score so the pipeline runs end to end.
     p = _model.score(text) if _model else min(1.0, 0.2 + 0.15 * len(flags))
     indicators = describe(flags)
+    model_p = p
 
+    content = extract_content(text)
+    verification = verify(text, content)
+    if config.TRUST_ADJUSTMENT:
+        p, trust_notes = trust.adjust(p, verification, flags)
+        indicators = trust_notes + indicators
+
+    # Analyst decisions come last, so a blocklisted site stays high risk even if its agency verifies.
     listing = reputation.status(url) if url else None
     if listing == "blocklisted":
         p = max(p, 0.9)
@@ -59,7 +67,6 @@ def scan_text(text: str, source: str = "text", url: str | None = None, media: st
         # Informational only: scammers copy trusted sites, so the model's score is not overridden.
         indicators.insert(0, "Website is on the SafePassage verified list")
 
-    content = extract_content(text)
     nov = novelty(text)
     label = risk_label(p)
     needs_review = label == "medium" or nov.score >= NOVELTY_THRESHOLD
@@ -71,10 +78,11 @@ def scan_text(text: str, source: str = "text", url: str | None = None, media: st
         source=source,
         url=url,
         risk=Risk(label=label, probability=round(p, 4)),
+        model_probability=round(model_p, 4),
         needs_review=needs_review,
         content=content,
         indicators=indicators,
-        verification=verify(text, content),
+        verification=verification,
         novelty=nov,
         campaign=campaign(text),
     )
