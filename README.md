@@ -240,7 +240,7 @@ The current settings are MEDIUM_RISK 0.4, which goes to human review, and HIGH_R
 
 ### Hyperparameter search (`reports/tuning.md`)
 
-Simulated annealing and a genetic algorithm (both written from scratch) were compared with random search and the default config. Each had the same 40-evaluation budget, was repeated over **3 seeds**, and was scored with grouped cross-validation on training data only (current, harder data). On cross-validation the GA scored highest (CV F1 0.937 ± 0.001; random 0.935 ± 0.003; SA 0.927 ± 0.014, one weak seed; default 0.923). **None beat the default on held-out data**: random and SA are within the confidence interval (test F1 0.803 and 0.805 vs 0.801), and the CV winner, GA, is worse (0.782, paired 95% CI of the difference excludes 0). The cross-validation gains come from overfitting the partly synthetic training distribution, so we keep the default configuration.
+Simulated annealing and a genetic algorithm (both written from scratch) were compared with random search and the default config. Each had the same 40-evaluation budget, was repeated over **3 seeds**, and was scored with grouped cross-validation on training data only (current data). On cross-validation the GA scored highest (CV F1 0.938 ± 0.001; random 0.935 ± 0.002; SA 0.927 ± 0.014, one weak seed; default 0.923). **None beat the default on held-out data**: test F1 0.805 (random), 0.803 (SA) and 0.801 (GA) against 0.808 for the default, all inside the paired 95% confidence interval, and the tuned configs have lower AUC (0.91–0.93 vs 0.94). The cross-validation gains come from overfitting the partly synthetic training distribution, so we keep the default configuration.
 
 ### Shifted set (n = 800): new tactics
 
