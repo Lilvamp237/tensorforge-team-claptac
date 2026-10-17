@@ -346,6 +346,74 @@ TAMIL = {
     "contact": ["தொடர்புக்கு 07X XXX XXXX.", "மேலதிக விபரங்களுக்கு அழைக்கவும் 07X XXX XXXX.",
                 "எமது அலுவலகத்திற்கு வரவும்."],
 }
+
+# ---------------------------------------------------------------- hard examples
+# Hard negatives: legit ads that look suspicious (fees, WhatsApp, deadlines, deposits), so the model can't just
+# learn "mentions a fee / WhatsApp / a deadline = scam". Merged into POOLS[lang]["legit"] and TAMIL["legit"].
+HARD_NEGATIVES = {
+    "en": {
+        "any": ["Shortlisted candidates will be contacted on WhatsApp to schedule the interview.",
+                "Applications close on 30 November. Late applications will not be accepted.",
+                "Urgent vacancies: interviews will be held this week at our office.",
+                "Interview dates are shared on WhatsApp 07X XXX XXXX after we review your CV.",
+                "Limited places this intake, so apply before the closing date.",
+                "Please bring a copy of your NIC and passport to the interview for verification."],
+        "foreign_job": ["{agency} (SLBFE licence {lic}): the only payment is the SLBFE registration fee of Rs. 22,027, "
+                        "paid at the SLBFE office with an official receipt.",
+                        "Medical tests are booked at an SLBFE-approved centre and paid there, with a receipt."],
+        "student_visa": ["The tuition deposit is paid only through the university's official online portal.",
+                         "Seat deposit of {legit_fee} is paid directly to the university, never to an agent."],
+        "visa_pr": ["Government visa fees are paid to the immigration department through its official website.",
+                    "Our registered adviser charges a published consultation fee; the visa decision is the embassy's."],
+        "local_job": ["Government vacancy as per the Gazette notice. An examination fee of Rs. 1,000 is payable to "
+                      "the Department.",
+                      "Part-time weekend role. Interview at our {country} office before selection."],
+    },
+    "singlish": {
+        "any": ["Interview time eka WhatsApp walin kiyanawa.",
+                "Applications close wenne November 30.",
+                "Ikmanata apply karanna, interview me sathiye office eke.",
+                "Interview ekata NIC eka passport eka copy ekak aran enna.",
+                "CV eka balala WhatsApp karanawa 07X XXX XXXX."],
+        "foreign_job": ["SLBFE registration fee Rs. 22,027 SLBFE office ekata gewanna, receipt ekak denawa.",
+                        "Medical eka SLBFE approve karapu centre ekaka, salli ethanata gewanna."],
+        "student_visa": ["University deposit eka official portal eken witharai gewanne."],
+        "visa_pr": ["Visa fee eka immigration department ekata official website eken gewanna."],
+        "local_job": ["Gazette eke thiyena vidihata exam fee Rs. 1,000 department ekata gewanna.",
+                      "Part time job, interview ekak thiyenawa office eke."],
+    },
+    "si": {
+        "any": ["සම්මුඛ පරීක්ෂණ වේලාව WhatsApp හරහා දැනුම් දෙනු ලැබේ.",
+                "අයදුම්පත් භාරගැනීම නොවැම්බර් 30 දිනෙන් අවසන් වේ.",
+                "හදිසි පුරප්පාඩු: මෙම සතියේ අපගේ කාර්යාලයේදී සම්මුඛ පරීක්ෂණ.",
+                "සම්මුඛ පරීක්ෂණයට ජාතික හැඳුනුම්පතේ සහ ගමන් බලපත්‍රයේ පිටපතක් රැගෙන එන්න.",
+                "ඔබේ CV එක පරීක්ෂා කළ පසු WhatsApp 07X XXX XXXX හරහා අමතනු ලැබේ."],
+        "foreign_job": ["SLBFE ලියාපදිංචි ගාස්තුව රු. 22,027 SLBFE කාර්යාලයේදී පමණක් ගෙවිය යුතුය, රිසිට්පතක් ලැබේ.",
+                        "වෛද්‍ය පරීක්ෂණය SLBFE අනුමත මධ්‍යස්ථානයක, ගාස්තුව එහිදීම ගෙවිය යුතුය."],
+        "student_visa": ["විශ්වවිද්‍යාල තැන්පතුව නිල වෙබ් ද්වාරය හරහා පමණක් ගෙවන්න."],
+        "visa_pr": ["වීසා ගාස්තුව ආගමන දෙපාර්තමේන්තුවට නිල වෙබ් අඩවිය හරහා ගෙවිය යුතුය."],
+        "local_job": ["ගැසට් නිවේදනය අනුව විභාග ගාස්තුව රු. 1,000 දෙපාර්තමේන්තුවට ගෙවිය යුතුය.",
+                      "අර්ධ කාලීන රැකියාව, ආයතනයේදී සම්මුඛ පරීක්ෂණයක් ඇත."],
+    },
+}
+TAMIL["legit"] += [
+    "நேர்முகத் தேர்வு நேரம் WhatsApp மூலம் அறிவிக்கப்படும்.",
+    "விண்ணப்பங்கள் நவம்பர் 30 உடன் முடிவடையும்.",
+    "வர்த்தமானி அறிவிப்பின்படி பரீட்சை கட்டணம் ரூ. 1,000 திணைக்களத்திற்கு செலுத்த வேண்டும்.",
+    "பல்கலைக்கழக வைப்புத்தொகை உத்தியோகபூர்வ இணையதளம் மூலம் மட்டுமே செலுத்தப்படும்.",
+    "பகுதி நேர வேலை, அலுவலகத்தில் நேர்முகத் தேர்வு உண்டு.",
+    "SLBFE பதிவு கட்டணம் ரூ. 22,027 SLBFE அலுவலகத்தில் மட்டுமே செலுத்தப்படும்.",
+]
+
+
+def _merge_hard(table: dict, label: str) -> None:
+    for lang, groups in table.items():
+        for key, lines in groups.items():
+            POOLS[lang][label].setdefault(key, []).extend(lines)
+
+
+_merge_hard(HARD_NEGATIVES, "legit")
+
 NEW_TACTICS = {  # tactic -> (category, scam lines)
     "crypto_payment": ("foreign_job", [
         "Pay the processing fee in USDT (TRC20) to the wallet address below for faster visa processing.",
