@@ -196,38 +196,62 @@ python scripts/calibrate_drift.py   # novelty index + drift thresholds, reports/
 
 ## Evaluation results
 
-**Model:** logistic regression on word 1–2-gram + character 2–5-gram TF-IDF features. The character n-grams carry Sinhala, Tamil and Singlish without a translation step. A second classifier predicts the content type. Numbers come from `reports/eval.json`; brackets are bootstrap 95% confidence intervals. Neither the test set nor the shifted set was used in training, and test rows that were near-copies of training rows (char n-gram cosine > 0.9) were removed. `reports/eval_hardening.md` explains what changed and why.
+**Model:** logistic regression on word 1–2-gram + character 2–5-gram TF-IDF features. The character n-grams carry Sinhala, Tamil and Singlish without a translation step. A second classifier predicts the content type. Numbers come from `reports/eval.json`; brackets are bootstrap 95% confidence intervals. Neither test set nor the shifted set was used in training, and test rows that were near-copies of training rows (char n-gram cosine > 0.9) were removed (`reports/eval_hardening.md` explains why).
+
+### Sri Lankan real-world set (n = 60, test only)
+
+`data/handwritten.csv`: 30 real legitimate ads (SLBFE job bank orders, ikman.lk ads from licensed agencies, official notices) and 30 scam offers, all with personal details removed. **Only 2 scam rows are real ads and 1 is partly quoted from a police warning. The other 27 are reconstructed from public warnings and news reports**, because those rarely quote the ad text. Sources and the human-verification status are in `data/handwritten_SOURCES.md`.
+
+| Threshold 0.5 | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|
+| Real-world set | 0.61 [0.47, 0.75] | **0.93 [0.83, 1.00]** | 0.74 [0.62, 0.83] | 0.78 [0.66, 0.89] |
+
+This is the most realistic number we have, and it is much lower than the synthetic scores. The model catches most scams, but it flags **60% of real legitimate ads**. Real agency ads use wording the synthetic legit ads don't. Analyst-confirmed labels from the review queue and the retraining loop are how this improves.
 
 ### Held-out test set (n = 1,698, 33% scam, threshold 0.5)
 
 | Slice | n | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|---|
-| **Overall** | 1,698 | 0.76 [0.73, 0.79] | 0.92 [0.90, 0.94] | 0.83 [0.81, 0.85] | 0.97 [0.96, 0.98] |
-| EMSCAD (real ads) | 698 | 0.89 [0.81, 0.95] | **0.62 [0.53, 0.71]** | 0.73 [0.65, 0.80] | 0.97 [0.95, 0.98] |
-| Synthetic Sri Lankan | 1,000 | 0.75 [0.71, 0.78] | 0.99 [0.98, 1.00] | 0.85 [0.83, 0.87] | 0.99 [0.98, 0.99] |
+| **Overall** | 1,698 | 0.76 [0.72, 0.79] | 0.85 [0.82, 0.88] | 0.80 [0.78, 0.83] | 0.94 [0.92, 0.95] |
+| EMSCAD (real ads) | 698 | 0.89 [0.82, 0.95] | 0.63 [0.53, 0.72] | 0.74 [0.66, 0.80] | 0.96 [0.95, 0.98] |
+| Synthetic Sri Lankan | 1,000 | 0.74 [0.70, 0.78] | 0.91 [0.88, 0.93] | 0.81 [0.79, 0.84] | 0.91 [0.90, 0.93] |
 
-Before the clean-up, EMSCAD F1 was 0.81. A quarter of the EMSCAD test ads were near-copies of training ads, and that inflated the score.
+| Language | n | Precision | Recall | F1 |
+|---|---|---|---|---|
+| English | 1,185 | 0.70 | 0.81 | 0.75 |
+| Sinhala | 206 | 0.84 | 0.90 | 0.87 |
+| Singlish | 307 | 0.83 | 0.91 | 0.87 |
 
-**At realistic scam rates.** The test set is 33% scam; real traffic probably isn't. At threshold 0.5, the model flags 14% of legitimate offers (27% of synthetic Sri Lankan ones). If 5% of offers were scams, about **1 alert in 4** would be a real scam (precision 0.26 [0.23, 0.29]). If 1% were scams, about 1 in 16 would be. At threshold 0.8, precision at a 5% scam rate rises to 0.51 and recall falls to 0.84.
+**Making the synthetic data harder lowered its scores on purpose.** The new data adds hard negatives (legit ads with fees, WhatsApp, deadlines), hard positives (scams without trigger words), held-out phrasing for every third line, and shortcut tokens balanced across classes. Synthetic recall fell from 0.99 to 0.91, and AUC from 0.99 to 0.91.
 
-**What the synthetic numbers mean.** A model trained only on EMSCAD scores AUC 0.71 on the synthetic offers, and a model trained only on synthetic offers scores AUC 0.61 on EMSCAD. Most synthetic test lines (65%) are phrases that also appear in train. So 0.99 recall shows how well the model learned our generator, and it is an upper bound for real Sri Lankan offers. Masking agency names, licence numbers, phone placeholders and amounts barely changes the scores (F1 0.83 → 0.84), so the model is not leaning on those tokens. Content-type accuracy on the synthetic test rows: 1.00.
+**What the synthetic numbers mean.** The two data sources don't transfer: a model trained only on EMSCAD scores AUC 0.59 on synthetic offers, and one trained only on synthetic offers scores 0.52 on EMSCAD. Synthetic scores measure how well the model learned our generator, so they are an upper bound. Masking agency names, licence numbers, phone placeholders and amounts barely moves the scores (57% of test rows change; F1 stays 0.80), so the model is not leaning on those tokens.
 
-**Thresholds** (picked on a validation split, checked on test; `config.py` is unchanged): best F1 at **0.58** (test P 0.79 / R 0.91), recall ≥ 0.9 on validation at **0.80** (test P 0.91 / R 0.84). The current values are MEDIUM_RISK 0.4 (test R 0.94) and HIGH_RISK 0.7 (test P 0.84). We lean towards recall: a false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees. Medium-risk scores go to human review rather than being shown as verdicts.
+**At realistic scam rates.** At threshold 0.5 the model flags about 13% of legitimate test offers. If 5% of offers were scams, about 1 alert in 4 would be real (precision 0.25). If 1% were scams, about 1 in 16 would be.
 
-### Shifted set (n = 800): how the model holds up on new tactics
+**Thresholds** (picked on a validation split, checked on test; `config.py` is unchanged):
+- **0.64**: recall ≥ 0.9 on validation. On test: precision 0.79, recall 0.81, and precision 0.29 at a 5% scam rate.
+- **0.33**: best F1 on validation. On test: precision 0.70, recall 0.90.
+
+The current settings are MEDIUM_RISK 0.4, which goes to human review, and HIGH_RISK 0.7. We lean towards recall: a false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees.
+
+### Hyperparameter search (`reports/tuning.md`)
+
+Simulated annealing and a genetic algorithm (both written from scratch) were compared with random search and the default config. Each had the same 40-evaluation budget and was scored with grouped cross-validation on training data only. SA and GA beat random search on cross-validation (CV F1 0.934 and 0.934 vs 0.930; default 0.923). **None beat the default on held-out data** (test F1 0.835 / 0.841 vs 0.848). The cross-validation gains came from overfitting the partly synthetic training distribution, so we kept the default. The search ran on the training data from before the harder synthetic set, with a single seed; repeating it over more seeds is the next step.
+
+### Shifted set (n = 800): new tactics
 
 | Tactic | n | Accuracy | Recall | Mean confidence |
 |---|---|---|---|---|
-| **Overall** | 800 | 0.889 | 0.937 | **0.811** (held-out: 0.898) |
-| Tamil-language offers | 323 | 0.895 | 0.983 | 0.781 |
-| Digital-ID "verification fee" | 55 | **0.709** | **0.652** | 0.728 |
-| Social / live-stream recruitment | 57 | 0.895 | 0.860 | 0.769 |
-| Cyber-scam compound jobs | 44 | 0.864 | 0.838 | 0.767 |
-| Crypto payment | 47 | 1.000 | 1.000 | 0.838 |
-| QR payment | 62 | 1.000 | 1.000 | 0.890 |
-| Military recruitment | 55 | 1.000 | 1.000 | 0.855 |
+| **Overall** | 800 | 0.88 | 0.94 | **0.82** (held-out: 0.90) |
+| Tamil-language offers | 300 | 0.84 | 0.92 | 0.79 |
+| Cyber-scam compound jobs | 58 | 0.86 | 0.84 | **0.74** |
+| Social / live-stream recruitment | 57 | 0.91 | 0.95 | 0.78 |
+| Digital-ID "verification fee" | 49 | 0.96 | 0.97 | 0.81 |
+| Crypto payment | 56 | 0.95 | 1.00 | 0.85 |
+| QR payment | 59 | 0.95 | 0.98 | 0.87 |
+| Military recruitment | 49 | 1.00 | 1.00 | 0.81 |
 
-Accuracy stays reasonable overall, but **confidence drops** and the newest pretext (digital-ID fees) is where the model starts to fail. That silent degradation is exactly what the monitoring layer is built to catch.
+Accuracy holds up, but **confidence drops** on new tactics. That silent degradation is what the drift monitor catches.
 
 ### Drift detection (`reports/drift_calibration.json`)
 
@@ -235,19 +259,19 @@ Thresholds are calibrated on 300 bootstrap windows of 200 predictions each: abov
 
 | Signal | Normal traffic, p99 | Shifted, median | Threshold |
 |---|---|---|---|
-| Language-mix PSI | 0.036 | 3.66 | 0.94 |
-| Content-type PSI | 0.067 | 1.38 | 0.40 |
-| Confidence drop | 0.019 | 0.098 | 0.038 |
-| Novelty share | 0.045 | 0.39 | 0.13 |
+| Language-mix PSI | 0.047 | 3.36 | 0.88 |
+| Content-type PSI | 0.066 | 1.06 | 0.31 |
+| Confidence drop | 0.019 | 0.080 | 0.034 |
+| Novelty share | 0.020 | 0.26 | 0.08 |
 
 | Scenario | Drift detected in |
 |---|---|
 | Normal held-out traffic | **0%** of windows (no false alarms) |
 | 100% shifted traffic | **100%** of windows |
 | 50% shifted mixed with normal | 100% |
-| 25% shifted mixed with normal | 20% (early warning only) |
+| 25% shifted mixed with normal | 26% (early warning only) |
 
-**End-to-end check:** `scripts/replay_shifted.py` streams 120 held-out offers (no alert), then shifted offers through the live service. The drift alert fires within 60 shifted scans, and high-risk scans switch to human review.
+**End-to-end check:** `scripts/replay_shifted.py` streams held-out offers (no alert), then shifted offers through the live service. The drift alert fires, and high-risk scans switch to human review.
 
 ## Impact statement
 
@@ -284,8 +308,8 @@ Every one of these people passes through channels we can sit in: SLBFE registrat
 
 - The registry and job orders are a snapshot from 17 Oct 2026. Job orders cover only the 540 agencies with an order approved in the 90 days before the crawl (the crawl was capped at about 600 requests), so a licensed agency with only older orders has no job-order data and its fees fall back to the global checks.
 - A fee is checked against the agency's own job order only when the offer names a matching licensed agency and the job title matches by keywords. Otherwise the fallback cap is the highest currently valid job order, Rs. 14,557,758 (Moldova hotel staff, licence 2963), which looks like an outlier and makes that fallback weak.
-- Much of the Sri Lankan training data is synthetic, and Sinhala and Singlish precision is lower (0.64–0.69). Analyst-confirmed labels from the review queue are the route to real-world data.
-- Mixed traffic with only about 25% new-tactic offers is detected in 20% of windows, so early drift is caught later than full drift.
+- Much of the Sri Lankan training data is synthetic. On the 60-ad real-world set the model flags 60% of real legitimate ads, and 27 of its 30 scam rows are reconstructions, not real ads. Analyst-confirmed labels from the review queue are the route to real-world data.
+- Mixed traffic with only about 25% new-tactic offers is detected in 26% of windows, so early drift is caught later than full drift.
 - The verifier is deterministic (registry and rule checks). There is no LLM claim checker yet.
-- Screenshots are read with Tesseract. English is reliable; **Sinhala OCR makes character-level mistakes** (e.g. a vowel sign or conjunct misread), so some Sinhala red-flag phrases can be missed. Tamil needs the `tam` language pack installed; without it only English and Sinhala are read. Uploaded images are never stored.
+- Screenshots are read with Tesseract. English is reliable; **Sinhala OCR makes character-level mistakes** (e.g. a vowel sign or conjunct misread), so some Sinhala red-flag phrases can be missed. The Docker image includes the English, Sinhala and Tamil packs; a local install needs them added. Uploaded images are never stored.
 - Voice notes are transcribed with Whisper *small* on CPU. It handles English and Tamil reasonably but is **weak on Sinhala**, so Sinhala voice notes may be scored on a poor transcript; the transcript is shown to the user and kept in the review queue so analysts can see what was heard. Uploaded audio is never stored.

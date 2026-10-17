@@ -6,8 +6,15 @@ ENV PYTHONPATH=/app/src \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
+# Tesseract with English, Sinhala and Tamil for screenshot OCR.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-sin tesseract-ocr-tam \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+# Pre-download the Whisper model so the first voice-note scan doesn't stall on a ~460 MB download.
+RUN python -c "from faster_whisper import WhisperModel; WhisperModel('small', device='cpu', compute_type='int8')"
 
 COPY src/ src/
 COPY app/ app/
