@@ -317,3 +317,10 @@ Every one of these people passes through channels we can sit in: SLBFE registrat
 - The verifier is deterministic (registry and rule checks). There is no LLM claim checker yet.
 - Screenshots are read with Tesseract. English is reliable; **Sinhala OCR makes character-level mistakes** (e.g. a vowel sign or conjunct misread), so some Sinhala red-flag phrases can be missed. The Docker image includes the English, Sinhala and Tamil packs; a local install needs them added. Uploaded images are never stored.
 - Voice notes are transcribed with Whisper *small* on CPU. It handles English and Tamil reasonably but is **weak on Sinhala**, so Sinhala voice notes may be scored on a poor transcript; the transcript is shown to the user and kept in the review queue so analysts can see what was heard. Uploaded audio is never stored.
+
+## AI tools used
+
+- **Claude Code (Anthropic)**: used by both team members as a coding assistant for scaffolding, the synthetic-data generator, training, evaluation and drift scripts, the voice/OCR input, tests, and drafting README sections and pull-request descriptions. Every change went through a pull request that a team member reviewed and merged, and both of us can explain the code.
+- **Pretrained / open models inside the product**: faster-whisper *small* (speech to text) and Tesseract OCR (English, Sinhala, Tamil). They only turn media into text; the scam classifier itself is our own model, trained in this repo.
+- **Text-to-speech for demo and test media**: Windows SAPI voices reading our own synthetic offers.
+- No other templates or scaffolds were reused; the repository started empty on 17 Oct 2026.
