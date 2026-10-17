@@ -466,6 +466,26 @@ TAMIL["scam"] += [
 ]
 _merge_hard(HARD_POSITIVES, "scam")
 
+# Shared sign-offs and openers, used by both classes at the same rate, so licence numbers, agency names, WhatsApp
+# and placeholder phones stop being label shortcuts (scams quote borrowed licences too).
+SIGNOFF = {
+    "en": POOLS["en"]["contact"] + POOLS["en"]["close"]["legit"] + [
+        "{agency} (SLBFE licence {lic}). WhatsApp 07X XXX XXXX.",
+        "Licence no. {lic} | {agency} | 07X XXX XXXX",
+        "{agency}, licensed by SLBFE ({lic}). Call 011 XXX XXXX or WhatsApp 07X XXX XXXX."],
+    "singlish": POOLS["singlish"]["contact"] + POOLS["singlish"]["close"]["legit"] + [
+        "{agency} | licence {lic} | WhatsApp 07X XXX XXXX",
+        "SLBFE licence {lic}, {agency}. Call 07X XXX XXXX."],
+    "si": POOLS["si"]["contact"] + POOLS["si"]["close"]["legit"] + [
+        "{agency} | බලපත්‍ර අංක {lic} | WhatsApp 07X XXX XXXX",
+        "SLBFE බලපත්‍ර {lic}, {agency}. අමතන්න 07X XXX XXXX."],
+}
+SHARED_OPEN = {
+    "en": ["Dear candidate,", "Greetings from our recruitment team.", "Dear applicants,", "Good news for job seekers."],
+    "singlish": ["Ayubowan!", "Dear candidates,", "Hello hamotama,"],
+    "si": ["ආයුබෝවන්!", "හිතවත් අයදුම්කරුවනි,", "රැකියා අපේක්ෂකයින්ට සුබ ආරංචියක්."],
+}
+
 NEW_TACTICS = {  # tactic -> (category, scam lines)
     "crypto_payment": ("foreign_job", [
         "Pay the processing fee in USDT (TRC20) to the wallet address below for faster visa processing.",
@@ -542,7 +562,10 @@ def compose(rng: random.Random, lang: str, label: str, cat: str, split: str) -> 
     P = POOLS[lang]
     pick = lambda items: rng.choice(_split_pool(items, split, rng))  # noqa: E731
     parts = []
-    if rng.random() < 0.8:
+    r = rng.random()
+    if r < 0.3:
+        parts.append(pick(SHARED_OPEN[lang]))
+    elif r < 0.8:
         parts.append(pick(P["open"][label]))
     parts.append(pick(P["offer"][cat]))
     generic = P[label]["any"]
@@ -556,8 +579,10 @@ def compose(rng: random.Random, lang: str, label: str, cat: str, split: str) -> 
         parts.insert(2, pick(P["legit"]["any"][:3]))
     if rng.random() < (0.5 if label == "legit" else 0.35):
         parts.append(pick(P["neutral"]))
-    # Contact lines are mostly shared so the sign-off cannot give the label away.
-    parts.append(pick(P["contact"]) if rng.random() < 0.6 else pick(P["close"][label]))
+    # Scam-only closes are urgency tactics (a real signal); the sign-off itself is shared by both classes.
+    if label == "scam" and rng.random() < 0.25:
+        parts.append(pick(P["close"]["scam"]))
+    parts.append(pick(SIGNOFF[lang]))
     return _render(parts, rng, cat, label)
 
 
