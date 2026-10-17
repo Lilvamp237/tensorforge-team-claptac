@@ -43,6 +43,7 @@ class Campaign(BaseModel):
 class ScanResult(BaseModel):
     scan_id: str
     source: Literal["text", "url", "file", "collector"]
+    url: str | None = None
     risk: Risk
     needs_review: bool
     content: Content

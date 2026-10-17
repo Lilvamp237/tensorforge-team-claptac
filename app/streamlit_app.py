@@ -1,4 +1,4 @@
-"""Streamlit UI: scan page + monitoring dashboard. Owner: Person B.
+"""Streamlit UI: scan page, monitoring dashboard and analyst console. Owner: Person B.
 
 Run: PYTHONPATH=src streamlit run app/streamlit_app.py
 """
@@ -6,12 +6,14 @@ Run: PYTHONPATH=src streamlit run app/streamlit_app.py
 import pandas as pd
 import streamlit as st
 
-from safepassage.drift import drift_report
-from safepassage.monitoring import read_log
-from safepassage.service import scan_file, scan_public_url, scan_text
+from safepassage import reputation
+from safepassage.fetch import UnsafeURL
+from safepassage.monitoring import pending_reviews, read_alerts, read_log
+from safepassage.response import check_drift, trigger_retrain
+from safepassage.service import reload_model, scan_file, scan_public_url, scan_text
 
 st.set_page_config(page_title="SafePassage LK", layout="wide")
-scan_tab, dash_tab = st.tabs(["Check an offer", "Monitoring dashboard"])
+scan_tab, dash_tab, analyst_tab = st.tabs(["Check an offer", "Monitoring", "Analyst console"])
 
 with scan_tab:
     st.title("SafePassage LK")
@@ -20,31 +22,89 @@ with scan_tab:
     url = st.text_input("...or a public link")
     upload = st.file_uploader("...or upload a letter (PDF/TXT)", type=["pdf", "txt"])
     if st.button("Check", type="primary"):
-        if upload:
-            result = scan_file(upload.read(), upload.name)
-        elif url:
-            result = scan_public_url(url)
-        elif text.strip():
-            result = scan_text(text)
-        else:
-            st.stop()
-        st.metric("Risk", result.risk.label.upper(), f"P(scam) = {result.risk.probability:.2f}")
+        try:
+            if upload:
+                st.session_state.result = scan_file(upload.read(), upload.name)
+            elif url:
+                st.session_state.result = scan_public_url(url)
+            elif text.strip():
+                st.session_state.result = scan_text(text)
+        except UnsafeURL as e:
+            st.error(f"Can't check that link: {e}")
+
+    result = st.session_state.get("result")
+    if result:
+        st.metric("Risk", result.risk.label.upper(), f"P(scam) = {result.risk.probability:.2f}", delta_color="off")
         for flag in result.indicators:
             st.write(f"- {flag}")
         if result.needs_review:
-            st.info("Sent to human review.")
+            st.info("An analyst will double-check this one.")
         with st.expander("Full result"):
             st.json(result.model_dump())
 
+    st.divider()
+    st.subheader("Report a website")
+    with st.form("report"):
+        report_url = st.text_input("Website or listing link")
+        verdict = st.radio("This offer is", ["scam", "legit"], horizontal=True)
+        comment = st.text_input("What happened? (no names or phone numbers)")
+        if st.form_submit_button("Send report") and report_url:
+            r = reputation.add_report(report_url, verdict, comment)
+            st.success(f"Thanks. {r['scam_reports']} scam report(s) on {r['domain']}. Analysts review sites with repeated reports.")
+
 with dash_tab:
-    report = drift_report()
+    report = check_drift()
     if report["drift"]:
-        st.error(f"Drift detected: {report['signals']}")
+        st.error(f"Drift detected: high-risk scans now go to human review. Signals: {report['signals']}")
     else:
-        st.success(f"No drift ({report['n']} recent scans)")
+        st.success(f"No drift ({report['n']} recent scans). Signals: {report['signals']}")
     rows = read_log()
     if rows:
         df = pd.json_normalize(rows)
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Scans", len(df))
+        c2.metric("High risk", int((df["risk.label"] == "high").sum()))
+        c3.metric("Sent to review", int(df["needs_review"].sum()))
         st.bar_chart(df["risk.label"].value_counts())
-        st.line_chart(df[["risk.probability", "novelty.score"]])
-        # TODO(B): review-queue table with approve/relabel, retrain button, alert history
+        st.line_chart(df[["risk.probability", "novelty.score"]].rolling(10, min_periods=1).mean())
+    st.subheader("Alerts")
+    alerts = read_alerts()
+    st.dataframe(pd.DataFrame(alerts[::-1]) if alerts else pd.DataFrame(), use_container_width=True)
+
+with analyst_tab:
+    st.subheader("Review queue")
+    queue = pending_reviews()
+    if not queue:
+        st.write("Nothing waiting.")
+    for item in queue:
+        rid = item["review_id"]
+        with st.container(border=True):
+            if item.get("kind") == "domain":
+                st.write(f"**Reported site:** {item['domain']} ({item['scam_reports']} scam reports)")
+                with st.expander("Reports"):
+                    st.dataframe(pd.DataFrame(reputation.reports(item["domain"])), use_container_width=True)
+                options = ["block", "allow", "dismiss"]
+            else:
+                st.write(f"**{item['risk']['label'].upper()}** ({item['risk']['probability']:.2f}) · {', '.join(item['indicators']) or 'no red flags'}")
+                st.caption(item.get("text", "")[:500])
+                options = ["scam", "legit", "dismiss"]
+            cols = st.columns(len(options))
+            for col, decision in zip(cols, options):
+                if col.button(decision.capitalize(), key=f"{rid}:{decision}"):
+                    reputation.apply_review(rid, decision)
+                    st.rerun()
+
+    st.subheader("Site lists")
+    lists = reputation.lists()
+    left, right = st.columns(2)
+    left.write("**Blocklist**")
+    left.json(lists["block"])
+    right.write("**Verified list**")
+    right.json(lists["allow"])
+
+    st.subheader("Model")
+    a, b = st.columns(2)
+    if a.button("Retrain with confirmed labels"):
+        st.write(trigger_retrain())
+    if b.button("Reload model"):
+        st.write({"model_loaded": reload_model()})
