@@ -192,35 +192,36 @@ python scripts/calibrate_drift.py   # novelty index + drift thresholds, reports/
 
 ## Evaluation results
 
-**Model:** logistic regression on word 1–2-gram + character 2–5-gram TF-IDF features. The character n-grams carry Sinhala, Tamil and Singlish without a translation step. A second classifier predicts the content type. Numbers come from `reports/eval.json`. Neither the test set nor the shifted set was used in training.
+**Model:** logistic regression on word 1–2-gram + character 2–5-gram TF-IDF features. The character n-grams carry Sinhala, Tamil and Singlish without a translation step. A second classifier predicts the content type. Numbers come from `reports/eval.json`; brackets are bootstrap 95% confidence intervals. Neither the test set nor the shifted set was used in training, and test rows that were near-copies of training rows (char n-gram cosine > 0.9) were removed. `reports/eval_hardening.md` explains what changed and why.
 
-### Held-out test set (n = 1,941, 30% scam)
+### Held-out test set (n = 1,698, 33% scam, threshold 0.5)
 
-| Slice | n | Accuracy | Precision | Recall | F1 | ROC-AUC |
-|---|---|---|---|---|---|---|
-| **Overall** | 1,941 | 0.883 | 0.745 | **0.932** | 0.828 | **0.975** |
-| EMSCAD (real ads) | 941 | 0.949 | 0.904 | 0.738 | 0.812 | 0.977 |
-| Synthetic Sri Lankan | 1,000 | 0.821 | 0.716 | 0.993 | 0.832 | 0.983 |
-| English | 1,426 | 0.921 | 0.814 | 0.891 | 0.851 | 0.979 |
-| Sinhala | 228 | 0.763 | 0.640 | 1.000 | 0.780 | 0.968 |
-| Singlish | 287 | 0.787 | 0.686 | 0.992 | 0.811 | 0.974 |
+| Slice | n | Precision | Recall | F1 | ROC-AUC |
+|---|---|---|---|---|---|
+| **Overall** | 1,698 | 0.76 [0.73, 0.79] | 0.92 [0.90, 0.94] | 0.83 [0.81, 0.85] | 0.97 [0.96, 0.98] |
+| EMSCAD (real ads) | 698 | 0.89 [0.81, 0.95] | **0.62 [0.53, 0.71]** | 0.73 [0.65, 0.80] | 0.97 [0.95, 0.98] |
+| Synthetic Sri Lankan | 1,000 | 0.75 [0.71, 0.78] | 0.99 [0.98, 1.00] | 0.85 [0.83, 0.87] | 0.99 [0.98, 0.99] |
 
-Content-type accuracy on the synthetic test rows: 1.00.
+Before the clean-up, EMSCAD F1 was 0.81. A quarter of the EMSCAD test ads were near-copies of training ads, and that inflated the score.
 
-The model leans towards recall: it misses few scams (recall 0.93) and over-flags some legitimate offers (precision 0.75), especially in Sinhala and Singlish. That's deliberate for a pre-payment warning tool. A false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees. Medium-risk scores go to human review rather than being shown as verdicts.
+**At realistic scam rates.** The test set is 33% scam; real traffic probably isn't. At threshold 0.5, the model flags 14% of legitimate offers (27% of synthetic Sri Lankan ones). If 5% of offers were scams, about **1 alert in 4** would be a real scam (precision 0.26 [0.23, 0.29]). If 1% were scams, about 1 in 16 would be. At threshold 0.8, precision at a 5% scam rate rises to 0.51 and recall falls to 0.84.
+
+**What the synthetic numbers mean.** A model trained only on EMSCAD scores AUC 0.71 on the synthetic offers, and a model trained only on synthetic offers scores AUC 0.61 on EMSCAD. Most synthetic test lines (65%) are phrases that also appear in train. So 0.99 recall shows how well the model learned our generator, and it is an upper bound for real Sri Lankan offers. Masking agency names, licence numbers, phone placeholders and amounts barely changes the scores (F1 0.83 → 0.84), so the model is not leaning on those tokens. Content-type accuracy on the synthetic test rows: 1.00.
+
+**Thresholds** (picked on a validation split, checked on test; `config.py` is unchanged): best F1 at **0.58** (test P 0.79 / R 0.91), recall ≥ 0.9 on validation at **0.80** (test P 0.91 / R 0.84). The current values are MEDIUM_RISK 0.4 (test R 0.94) and HIGH_RISK 0.7 (test P 0.84). We lean towards recall: a false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees. Medium-risk scores go to human review rather than being shown as verdicts.
 
 ### Shifted set (n = 800): how the model holds up on new tactics
 
 | Tactic | n | Accuracy | Recall | Mean confidence |
 |---|---|---|---|---|
-| **Overall** | 800 | 0.884 | 0.935 | **0.810** (held-out: 0.907) |
-| Tamil-language offers | 323 | 0.882 | 0.977 | 0.781 |
-| Digital-ID "verification fee" | 55 | **0.691** | **0.630** | 0.731 |
-| Social / live-stream recruitment | 57 | 0.877 | 0.837 | 0.758 |
-| Cyber-scam compound jobs | 44 | 0.909 | 0.892 | 0.758 |
-| Crypto payment | 47 | 1.000 | 1.000 | 0.830 |
-| QR payment | 62 | 1.000 | 1.000 | 0.883 |
-| Military recruitment | 55 | 1.000 | 1.000 | 0.858 |
+| **Overall** | 800 | 0.889 | 0.937 | **0.811** (held-out: 0.898) |
+| Tamil-language offers | 323 | 0.895 | 0.983 | 0.781 |
+| Digital-ID "verification fee" | 55 | **0.709** | **0.652** | 0.728 |
+| Social / live-stream recruitment | 57 | 0.895 | 0.860 | 0.769 |
+| Cyber-scam compound jobs | 44 | 0.864 | 0.838 | 0.767 |
+| Crypto payment | 47 | 1.000 | 1.000 | 0.838 |
+| QR payment | 62 | 1.000 | 1.000 | 0.890 |
+| Military recruitment | 55 | 1.000 | 1.000 | 0.855 |
 
 Accuracy stays reasonable overall, but **confidence drops** and the newest pretext (digital-ID fees) is where the model starts to fail. That silent degradation is exactly what the monitoring layer is built to catch.
 
