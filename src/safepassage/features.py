@@ -1,4 +1,4 @@
-"""Hand-written red-flag rules, used both as model features and as explanations."""
+"""Rule-based red flags, used as model features and as human-readable explanations. Owner: Person A."""
 
 import re
 
@@ -11,6 +11,21 @@ RED_FLAGS = {
     "visa_conversion": r"\bvisit visa\b.*\b(work|convert)|\bconvert(ed)? to (work|pr)\b",
     "pr_shortcut": r"\b(direct|fast|guaranteed) pr\b|skip (the )?points",
     "contact_offplatform": r"\b(whatsapp|telegram|viber)\b",
+    "task_scam": r"\b(like|rate|review|subscribe)\b.{0,30}\b(videos?|products?|hotels?|channels?)\b|prepaid task|daily commission",
+    "id_document_request": r"\b(nic|national id|passport|birth certificate)\b.{0,25}\b(copy|copies|photo|send|upload)\b",
+}
+
+LABELS = {
+    "upfront_fee": "Advance payment requested",
+    "guaranteed": "Guaranteed visa/job language",
+    "urgency": "Pressure or urgency tactics",
+    "personal_account": "Payment to a personal account",
+    "no_interview": "No interview or qualifications needed",
+    "visa_conversion": "Visit visa promised to convert to work/PR",
+    "pr_shortcut": "PR shortcut claims",
+    "contact_offplatform": "Personal messaging contact",
+    "task_scam": "Online task-job pattern",
+    "id_document_request": "Asks for ID documents",
 }
 
 _COMPILED = {name: re.compile(p, re.IGNORECASE) for name, p in RED_FLAGS.items()}
@@ -18,3 +33,7 @@ _COMPILED = {name: re.compile(p, re.IGNORECASE) for name, p in RED_FLAGS.items()
 
 def find_red_flags(text: str) -> list[str]:
     return [name for name, rx in _COMPILED.items() if rx.search(text)]
+
+
+def describe(flags: list[str]) -> list[str]:
+    return [LABELS[f] for f in flags]

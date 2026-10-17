@@ -1,6 +1,8 @@
+"""Supervised classifier wrapper. Owner: Person A."""
+
 import joblib
 
-from .config import MODEL_PATH, REVIEW_THRESHOLD, SCAM_THRESHOLD
+from .config import HIGH_RISK, MEDIUM_RISK, MODEL_PATH
 
 
 class ScamModel:
@@ -13,9 +15,9 @@ class ScamModel:
         return float(self.pipeline.predict_proba([text])[0][classes.index("scam")])
 
 
-def verdict(score: float) -> str:
-    if score >= SCAM_THRESHOLD:
-        return "scam"
-    if score >= REVIEW_THRESHOLD:
-        return "suspicious"
-    return "legit"
+def risk_label(p: float) -> str:
+    if p >= HIGH_RISK:
+        return "high"
+    if p >= MEDIUM_RISK:
+        return "medium"
+    return "low"

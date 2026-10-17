@@ -1,46 +1,48 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
+"""REST adapter. Owner: Person B."""
+
+from fastapi import FastAPI, HTTPException, UploadFile
+from pydantic import BaseModel, Field, HttpUrl
 
 from . import __version__
-from .config import MODEL_PATH
-from .features import find_red_flags
-from .model import ScamModel, verdict
-from .monitoring import log_prediction
+from .drift import drift_report
+from .fetch import UnsafeURL
+from .schema import ScanResult
+from .service import model_loaded, scan_file, scan_public_url, scan_text
 
 app = FastAPI(title="SafePassage LK", version=__version__)
 
-_model: ScamModel | None = ScamModel() if MODEL_PATH.exists() else None
+
+class TextScanRequest(BaseModel):
+    text: str = Field(min_length=1, max_length=20_000)
 
 
-class Offer(BaseModel):
-    text: str = Field(min_length=1)
-    destination: str | None = None
-    offer_type: str | None = None  # foreign_job | student_visa | visa_pr
-
-
-class Prediction(BaseModel):
-    label: str
-    scam_score: float
-    red_flags: list[str]
-    needs_review: bool
+class URLScanRequest(BaseModel):
+    url: HttpUrl
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "model_loaded": _model is not None, "version": __version__}
+    return {"status": "ok", "model_loaded": model_loaded(), "version": __version__}
 
 
-@app.post("/predict", response_model=Prediction)
-def predict(offer: Offer):
-    if _model is None:
-        raise HTTPException(503, "Model not trained yet. Run scripts/train_baseline.py")
-    score = _model.score(offer.text)
-    label = verdict(score)
-    result = Prediction(
-        label=label,
-        scam_score=round(score, 4),
-        red_flags=find_red_flags(offer.text),
-        needs_review=label == "suspicious",
-    )
-    log_prediction({**offer.model_dump(), **result.model_dump()})
-    return result
+@app.post("/api/v1/scans/text", response_model=ScanResult)
+def scan_text_endpoint(req: TextScanRequest):
+    return scan_text(req.text)
+
+
+@app.post("/api/v1/scans/url", response_model=ScanResult)
+def scan_url_endpoint(req: URLScanRequest):
+    try:
+        return scan_public_url(str(req.url))
+    except UnsafeURL as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/v1/scans/file", response_model=ScanResult)
+async def scan_file_endpoint(file: UploadFile):
+    return scan_file(await file.read(), file.filename or "upload.txt")
+
+
+@app.get("/api/v1/drift")
+def drift():
+    return drift_report()
