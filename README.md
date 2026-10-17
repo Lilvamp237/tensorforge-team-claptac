@@ -77,6 +77,8 @@ docker compose up --build
 | REST API + interactive docs | http://localhost:8000/docs |
 | MCP server (Streamable HTTP, localhost only) | http://localhost:8001/mcp |
 
+On first start the `api` container builds any missing models (`scripts/bootstrap.py`: dataset → train → calibrate drift, about 1–2 minutes, downloads EMSCAD). The web app and MCP server wait until the API is healthy. Later starts reuse the models.
+
 `logs/`, `models/` and `data/processed/` are shared with the host. To use a newly trained model, click **Reload model** in the analyst console, or `POST /api/v1/model/reload`.
 
 Optional: `ALERT_WEBHOOK_URL=https://... docker compose up` also posts drift alerts to a webhook.
@@ -86,7 +88,7 @@ Optional: `ALERT_WEBHOOK_URL=https://... docker compose up` also posts drift ale
 ```bash
 pip install -r requirements.txt
 export PYTHONPATH=src            # PowerShell: $env:PYTHONPATH="src"
-python scripts/train_baseline.py # creates models/baseline.joblib (until then a red-flag score is used)
+python scripts/bootstrap.py      # builds missing models once (until then a red-flag score is used)
 uvicorn safepassage.api:app --port 8000
 streamlit run app/streamlit_app.py
 python -m safepassage.mcp_server

@@ -30,7 +30,8 @@ services:
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health')"]
     depends_on:
-      - api
+      api:
+        condition: service_healthy  # the api container builds missing models first
 
   mcp:
     <<: *app
@@ -42,3 +43,6 @@ services:
       - "127.0.0.1:8001:8001"
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8001), 2)"]
+    depends_on:
+      api:
+        condition: service_healthy
