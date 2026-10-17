@@ -10,7 +10,8 @@ from safepassage import reputation, retrain
 from safepassage.fetch import UnsafeURL
 from safepassage.monitoring import pending_reviews, read_alerts, read_log
 from safepassage.response import check_drift, trigger_retrain
-from safepassage.service import reload_model, scan_file, scan_public_url, scan_text
+from safepassage.media import AUDIO_EXTENSIONS, MediaError, is_audio
+from safepassage.service import reload_model, scan_audio, scan_file, scan_public_url, scan_text
 
 st.set_page_config(page_title="SafePassage LK", layout="wide")
 scan_tab, dash_tab, analyst_tab = st.tabs(["Check an offer", "Monitoring", "Analyst console"])
@@ -20,10 +21,20 @@ with scan_tab:
     st.caption("Check a job, study or visa offer before you pay. Risk assessment only, not a fraud determination.")
     text = st.text_area("Paste the offer or message")
     url = st.text_input("...or a public link")
-    upload = st.file_uploader("...or upload a letter (PDF/TXT)", type=["pdf", "txt"])
+    upload = st.file_uploader("...or upload a letter (PDF/TXT) or a voice note (MP3/WAV/M4A/OGG)",
+                              type=["pdf", "txt"] + [e.lstrip(".") for e in AUDIO_EXTENSIONS])
+    hint = st.selectbox("Voice note language", ["Auto-detect", "English", "Tamil", "Sinhala"],
+                        help="Optional. Transcription is weaker for Sinhala.")
     if st.button("Check", type="primary"):
+        st.session_state.extracted = None
         try:
-            if upload:
+            if upload and is_audio(upload.name):
+                lang = {"English": "en", "Tamil": "ta", "Sinhala": "si"}.get(hint)
+                with st.spinner("Listening... (the first voice note downloads the speech model, about 460 MB)"):
+                    scan = scan_audio(upload.read(), upload.name, lang)
+                st.session_state.extracted = ("What we heard", scan.text)
+                st.session_state.result = scan.result
+            elif upload:
                 st.session_state.result = scan_file(upload.read(), upload.name)
             elif url:
                 st.session_state.result = scan_public_url(url)
@@ -31,8 +42,13 @@ with scan_tab:
                 st.session_state.result = scan_text(text)
         except UnsafeURL as e:
             st.error(f"Can't check that link: {e}")
+        except MediaError as e:
+            st.error(f"Can't read that file: {e}")
 
     result = st.session_state.get("result")
+    extracted = st.session_state.get("extracted")
+    if result and extracted:
+        st.text_area(extracted[0], extracted[1], disabled=True)
     if result:
         st.metric("Risk", result.risk.label.upper(), f"P(scam) = {result.risk.probability:.2f}", delta_color="off")
         for flag in result.indicators:

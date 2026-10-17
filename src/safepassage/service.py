@@ -1,6 +1,7 @@
 """The one shared pipeline. Every adapter (REST, MCP, collector, UI) calls these functions."""
 
 import uuid
+from typing import NamedTuple
 
 from . import reputation
 from .config import MODEL_PATH, NOVELTY_THRESHOLD
@@ -41,7 +42,8 @@ def reload_model() -> bool:
     return model_loaded()
 
 
-def scan_text(text: str, source: str = "text", url: str | None = None) -> ScanResult:
+def scan_text(text: str, source: str = "text", url: str | None = None, media: str | None = None) -> ScanResult:
+    """`media` ("audio" / "image") marks text that was transcribed or OCR'd, so analysts know what they read."""
     if _version_stamp() != _loaded_stamp:  # another process (the scheduler) promoted or rolled back a model
         reload_model()
     flags = find_red_flags(text)
@@ -79,7 +81,7 @@ def scan_text(text: str, source: str = "text", url: str | None = None) -> ScanRe
     record = result.model_dump()
     log_prediction(record)
     if result.needs_review:
-        enqueue_review({**record, "text": text[:2000]})
+        enqueue_review({**record, "text": text[:2000], **({"media": media} if media else {})})
     check_drift()
     return result
 
@@ -97,3 +99,16 @@ def scan_file(data: bytes, filename: str) -> ScanResult:
     content_type = "application/pdf" if filename.lower().endswith(".pdf") else "text/plain"
     # TODO(B, stretch): image OCR
     return scan_text(extract_text(data, content_type), source="file")
+
+
+class MediaScan(NamedTuple):
+    text: str  # what we heard / read, shown to the user above the result
+    result: ScanResult
+
+
+def scan_audio(data: bytes, filename: str, language: str | None = None) -> MediaScan:
+    """Voice note -> transcript -> the same pipeline. The audio itself is never stored."""
+    from .media import transcribe
+
+    text = transcribe(data, filename, language)
+    return MediaScan(text, scan_text(text, source="file", media="audio"))

@@ -58,3 +58,8 @@ def test_multilingual_red_flags(text, flags):
 
 def test_legit_disclaimer_is_not_guarantee():
     assert "guaranteed" not in find_red_flags("Visa decision is made only by the embassy, we cannot guarantee it.")
+
+
+def test_spoken_amounts_with_currency_after_the_number():
+    d = extract_details("Salary 600,000 rupees a month. Pay the registration fee of 150,000 rupees today.")
+    assert [m.amount for m in d.fees] == [150000] and [m.amount for m in d.salaries] == [600000]

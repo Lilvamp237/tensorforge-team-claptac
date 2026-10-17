@@ -32,6 +32,7 @@ _MULT = r"(lakhs?|laks?|mn|million|k|thousand|லட்சம்|ලක්ෂ|�
 _MONEY_RX = [
     re.compile(_CUR + r"\s*" + _NUM + r"(?:\s*" + _MULT + r"\b)?", re.IGNORECASE),  # Rs. 150,000 / USD 3,000
     re.compile(_NUM + r"\s*" + _MULT + r"(?![A-Za-z])(?:\s*(?:rupees|ரூபாய்|රුපියල්))?", re.IGNORECASE),  # 5 லட்சம்
+    re.compile(_NUM + r"\s*(?:rupees|rs\b\.?|lkr\b|ரூபாய்|රුපියල්)", re.IGNORECASE),  # 150,000 rupees (speech)
 ]
 _FEE_WORDS = re.compile(r"fee|deposit|pay|advance|charge|gewanna|gewala|gewwama|ගාස්තු|ගෙව|තැන්පතු|අත්තිකාරම්|"
                         r"கட்டணம்|செலுத்த", re.IGNORECASE)
@@ -208,7 +209,7 @@ def find_money(text: str) -> list[Money]:
                 cur, num, mult = m.group(1), m.group(2), m.group(3)
                 currency = _CURRENCY_ALIASES.get(cur.lower(), cur.upper())
             else:
-                num, mult, currency = m.group(1), m.group(2), "LKR"
+                num, mult, currency = m.group(1), m.group(2) if rx.groups >= 2 else None, "LKR"
             try:
                 amount = _to_number(num, mult)
             except ValueError:

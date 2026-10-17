@@ -11,4 +11,6 @@ pypdf==6.19.0
 streamlit==1.56.0
 mcp==2.3.0
 httpx==0.27.2
+faster-whisper==1.2.1
+av==16.1.0
 pytest==9.0.2
