@@ -3,8 +3,8 @@
   "n_windows": 300,
   "thresholds": {
     "language_psi": 0.8748,
-    "category_psi": 0.2781,
-    "confidence_drop": 0.0323,
+    "category_psi": 0.2748,
+    "confidence_drop": 0.0322,
     "novelty_share": 0.0988
   },
   "separation": {
@@ -13,12 +13,12 @@
       "shifted_median": 3.3573
     },
     "category_psi": {
-      "normal_p99": 0.0653,
-      "shifted_median": 0.9164
+      "normal_p99": 0.0651,
+      "shifted_median": 0.9037
     },
     "confidence_drop": {
-      "normal_p99": 0.0186,
-      "shifted_median": 0.0735
+      "normal_p99": 0.0185,
+      "shifted_median": 0.0731
     },
     "novelty_share": {
       "normal_p99": 0.02,
@@ -48,33 +48,33 @@
     "per_signal": {
       "language_psi": 1.0,
       "category_psi": 0.003,
-      "confidence_drop": 0.533,
+      "confidence_drop": 0.527,
       "novelty_share": 1.0
     }
   },
   "detection_rate_mixed_25pct_shifted": {
-    "any": 0.35,
+    "any": 0.33,
     "per_signal": {
       "language_psi": 0.07,
       "category_psi": 0.0,
-      "confidence_drop": 0.033,
-      "novelty_share": 0.317
+      "confidence_drop": 0.037,
+      "novelty_share": 0.293
     }
   },
   "full_set_signals": {
     "heldout_test": {
       "language_psi": 0.0002,
-      "category_psi": 0.0098,
-      "mean_confidence": 0.8996,
-      "confidence_drop": -0.0051,
+      "category_psi": 0.0097,
+      "mean_confidence": 0.8998,
+      "confidence_drop": -0.005,
       "novelty_share": 0.0082
     },
     "shifted": {
       "language_psi": 3.3228,
-      "category_psi": 0.896,
-      "mean_confidence": 0.8205,
-      "confidence_drop": 0.0741,
-      "novelty_share": 0.3375
+      "category_psi": 0.8836,
+      "mean_confidence": 0.8212,
+      "confidence_drop": 0.0737,
+      "novelty_share": 0.3337
     }
   }
 }
