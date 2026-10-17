@@ -228,11 +228,11 @@ This is the most realistic number we have, and it is much lower than the synthet
 
 **At realistic scam rates.** At threshold 0.5 the model flags about 13% of legitimate test offers. If 5% of offers were scams, about 1 alert in 4 would be real (precision 0.25). If 1% were scams, about 1 in 16 would be.
 
-**Thresholds** (picked on a validation split, checked on test; `config.py` is unchanged):
+**Thresholds** (picked on a validation split, checked on test):
 - **0.64**: recall ≥ 0.9 on validation. On test: precision 0.79, recall 0.81, and precision 0.29 at a 5% scam rate.
 - **0.33**: best F1 on validation. On test: precision 0.70, recall 0.90.
 
-The current settings are MEDIUM_RISK 0.4, which goes to human review, and HIGH_RISK 0.7. We lean towards recall: a false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees.
+The current settings are MEDIUM_RISK 0.4, which goes to human review, and HIGH_RISK 0.65 (next to the 0.64 recall-first threshold; on test it labels 81% of scams "high" and sends 6% of offers to review). We lean towards recall: a false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees.
 
 ### Hyperparameter search (`reports/tuning.md`)
 
