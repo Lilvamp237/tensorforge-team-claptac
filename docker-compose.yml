@@ -1,0 +1,44 @@
+# docker compose up --build
+#   API        http://localhost:8000/docs
+#   Web app    http://localhost:8501
+#   MCP        http://localhost:8001/mcp  (published on localhost only)
+# All three share logs/, models/ and data/processed/ with the host, so they see the same predictions,
+# alerts and review queue, and pick up a model trained on the host after "Reload model".
+
+x-app: &app
+  build: .
+  image: safepassage-lk
+  restart: unless-stopped
+  environment:
+    ALERT_WEBHOOK_URL: ${ALERT_WEBHOOK_URL:-}
+  volumes:
+    - ./logs:/app/logs
+    - ./models:/app/models
+    - ./data/processed:/app/data/processed
+
+services:
+  api:
+    <<: *app
+    ports:
+      - "8000:8000"
+
+  ui:
+    <<: *app
+    command: ["streamlit", "run", "app/streamlit_app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
+    ports:
+      - "8501:8501"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health')"]
+    depends_on:
+      - api
+
+  mcp:
+    <<: *app
+    command: ["python", "-m", "safepassage.mcp_server"]
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8001"
+    ports:
+      - "127.0.0.1:8001:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 8001), 2)"]
