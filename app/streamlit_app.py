@@ -69,8 +69,10 @@ with scan_tab:
         report_url = st.text_input("Website or listing link")
         verdict = st.radio("This offer is", ["scam", "legit"], horizontal=True)
         comment = st.text_input("What happened? (no names or phone numbers)")
+        rater_id = st.text_input("Your SafePassage ID (optional)",
+                                 help="Lets reliable reporters count for more. Stored only as a salted hash.")
         if st.form_submit_button("Send report") and report_url:
-            r = reputation.add_report(report_url, verdict, comment)
+            r = reputation.add_report(report_url, verdict, comment, rater_id.strip() or None)
             st.success(f"Thanks. {r['scam_reports']} scam report(s) on {r['domain']}. Analysts review sites with repeated reports.")
 
 with dash_tab:
