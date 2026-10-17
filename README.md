@@ -212,25 +212,25 @@ This is the most realistic number we have, and it is much lower than the synthet
 
 | Slice | n | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|---|
-| **Overall** | 1,698 | 0.76 [0.72, 0.79] | 0.85 [0.82, 0.88] | 0.80 [0.78, 0.83] | 0.94 [0.92, 0.95] |
-| EMSCAD (real ads) | 698 | 0.89 [0.82, 0.95] | 0.63 [0.53, 0.72] | 0.74 [0.66, 0.80] | 0.96 [0.95, 0.98] |
-| Synthetic Sri Lankan | 1,000 | 0.74 [0.70, 0.78] | 0.91 [0.88, 0.93] | 0.81 [0.79, 0.84] | 0.91 [0.90, 0.93] |
+| **Overall** | 1,698 | 0.77 [0.73, 0.80] | 0.85 [0.82, 0.88] | 0.81 [0.78, 0.83] | 0.94 [0.93, 0.95] |
+| EMSCAD (real ads) | 698 | 0.90 [0.82, 0.96] | 0.61 [0.52, 0.70] | 0.73 [0.65, 0.79] | 0.96 [0.94, 0.98] |
+| Synthetic Sri Lankan | 1,000 | 0.75 [0.71, 0.79] | 0.91 [0.89, 0.94] | 0.82 [0.80, 0.85] | 0.92 [0.91, 0.94] |
 
 | Language | n | Precision | Recall | F1 |
 |---|---|---|---|---|
 | English | 1,185 | 0.70 | 0.81 | 0.75 |
-| Sinhala | 206 | 0.84 | 0.90 | 0.87 |
-| Singlish | 307 | 0.83 | 0.91 | 0.87 |
+| Sinhala | 206 | 0.89 | 0.91 | 0.90 |
+| Singlish | 307 | 0.84 | 0.91 | 0.88 |
 
-**Making the synthetic data harder lowered its scores on purpose.** The new data adds hard negatives (legit ads with fees, WhatsApp, deadlines), hard positives (scams without trigger words), held-out phrasing for every third line, and shortcut tokens balanced across classes. Synthetic recall fell from 0.99 to 0.91, and AUC from 0.99 to 0.91.
+**Making the synthetic data harder lowered its scores on purpose.** The new data adds hard negatives (legit ads with fees, WhatsApp, deadlines), hard positives (scams without trigger words), held-out phrasing for every third line, and shortcut tokens balanced across classes. Synthetic recall fell from 0.99 to 0.91, and AUC from 0.99 to 0.92.
 
 **What the synthetic numbers mean.** The two data sources don't transfer: a model trained only on EMSCAD scores AUC 0.59 on synthetic offers, and one trained only on synthetic offers scores 0.52 on EMSCAD. Synthetic scores measure how well the model learned our generator, so they are an upper bound. Masking agency names, licence numbers, phone placeholders and amounts barely moves the scores (57% of test rows change; F1 stays 0.80), so the model is not leaning on those tokens.
 
-**At realistic scam rates.** At threshold 0.5 the model flags about 13% of legitimate test offers. If 5% of offers were scams, about 1 alert in 4 would be real (precision 0.25). If 1% were scams, about 1 in 16 would be.
+**At realistic scam rates.** At threshold 0.5 the model flags about 13% of legitimate test offers. If 5% of offers were scams, about 1 alert in 4 would be real (precision 0.26). If 1% were scams, about 1 in 16 would be.
 
 **Thresholds** (picked on a validation split, checked on test; `config.py` is unchanged):
-- **0.64**: recall ≥ 0.9 on validation. On test: precision 0.79, recall 0.81, and precision 0.29 at a 5% scam rate.
-- **0.33**: best F1 on validation. On test: precision 0.70, recall 0.90.
+- **0.63**: recall ≥ 0.9 on validation. On test: precision 0.81, recall 0.82, and precision 0.31 at a 5% scam rate.
+- **0.29**: best F1 on validation. On test: precision 0.69, recall 0.93.
 
 The current settings are MEDIUM_RISK 0.4, which goes to human review, and HIGH_RISK 0.7. We lean towards recall: a false alarm costs a phone call to SLBFE, while a missed scam can cost millions of rupees.
 
@@ -242,14 +242,14 @@ Simulated annealing and a genetic algorithm (both written from scratch) were com
 
 | Tactic | n | Accuracy | Recall | Mean confidence |
 |---|---|---|---|---|
-| **Overall** | 800 | 0.88 | 0.94 | **0.82** (held-out: 0.90) |
-| Tamil-language offers | 300 | 0.84 | 0.92 | 0.79 |
+| **Overall** | 800 | 0.87 | 0.94 | **0.82** (held-out: 0.90) |
+| Tamil-language offers | 300 | 0.82 | 0.90 | 0.79 |
 | Cyber-scam compound jobs | 58 | 0.86 | 0.84 | **0.74** |
-| Social / live-stream recruitment | 57 | 0.91 | 0.95 | 0.78 |
-| Digital-ID "verification fee" | 49 | 0.96 | 0.97 | 0.81 |
+| Social / live-stream recruitment | 57 | 0.93 | 0.98 | 0.78 |
+| Digital-ID "verification fee" | 49 | 0.96 | 0.97 | 0.82 |
 | Crypto payment | 56 | 0.95 | 1.00 | 0.85 |
-| QR payment | 59 | 0.95 | 0.98 | 0.87 |
-| Military recruitment | 49 | 1.00 | 1.00 | 0.81 |
+| QR payment | 59 | 0.98 | 1.00 | 0.87 |
+| Military recruitment | 49 | 1.00 | 1.00 | 0.82 |
 
 Accuracy holds up, but **confidence drops** on new tactics. That silent degradation is what the drift monitor catches.
 
@@ -259,10 +259,10 @@ Thresholds are calibrated on 300 bootstrap windows of 200 predictions each: abov
 
 | Signal | Normal traffic, p99 | Shifted, median | Threshold |
 |---|---|---|---|
-| Language-mix PSI | 0.047 | 3.36 | 0.88 |
-| Content-type PSI | 0.066 | 1.06 | 0.31 |
-| Confidence drop | 0.019 | 0.080 | 0.034 |
-| Novelty share | 0.020 | 0.26 | 0.08 |
+| Language-mix PSI | 0.047 | 3.36 | 0.87 |
+| Content-type PSI | 0.065 | 1.02 | 0.30 |
+| Confidence drop | 0.019 | 0.075 | 0.033 |
+| Novelty share | 0.020 | 0.26 | 0.080 |
 
 | Scenario | Drift detected in |
 |---|---|
