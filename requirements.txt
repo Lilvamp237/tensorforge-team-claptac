@@ -3,8 +3,8 @@ uvicorn==0.53.0
 pydantic==2.12.5
 python-multipart==0.0.20
 scikit-learn==1.8.0
-pandas==3.0.2
-numpy==2.2.6
+pandas==3.0.6
+numpy==2.5.4
 joblib==1.5.3
 requests==2.32.5
 pypdf==6.19.0

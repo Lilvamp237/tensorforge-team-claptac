@@ -85,7 +85,7 @@ Optional: `ALERT_WEBHOOK_URL=https://... docker compose up` also posts drift ale
 
 Optional background jobs (off by default): `docker compose --profile jobs up --build` also starts the **retrain scheduler** (checks every 60 minutes, retrains after 20 new analyst-confirmed labels, or sooner during drift) and runs the **ikman collector** once (it scans new public listings through the API, then exits; run it again with `docker compose run --rm collector`).
 
-### Without Docker (Python 3.12)
+### Without Docker (Python 3.14)
 
 ```bash
 pip install -r requirements.txt
