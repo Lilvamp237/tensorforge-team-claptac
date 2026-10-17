@@ -225,10 +225,42 @@ Thresholds are calibrated on 300 bootstrap windows of 200 predictions each: abov
 
 **End-to-end check:** `scripts/replay_shifted.py` streams 120 held-out offers (no alert), then shifted offers through the live service. The drift alert fires within 60 shifted scans, and high-risk scans switch to human review.
 
-## Still to complete
+## Impact statement
 
-- Problem and users
-- Data sources and licences
-- Evaluation results (held-out test set and shifted set)
-- Impact statement
-- AI tools used: Claude Code (Anthropic) for scaffolding, research and code assistance
+**Who is protected.** People about to pay for a job, study place or visa they found online, by phone or on paper:
+- First-time migrant workers, especially rural women going into domestic work and young men chasing Gulf, Korea, Israel, Japan or Europe jobs.
+- Local job seekers targeted by "task" jobs and fake government vacancies.
+- Students and families dealing with education and migration agents.
+
+They get a plain-language warning, with reasons, *before* they hand over money or their passport. Investigators get a triage queue instead of a pile of complaints.
+
+**How many we could reach.**
+- About 311,000 Sri Lankans left for foreign employment in 2025, and the government targets 350,000 for 2026.
+- More than 25,000 students study abroad.
+- The pool of local job seekers reached by online job ads is larger still.
+
+Every one of these people passes through channels we can sit in: SLBFE registration and pre-departure training, job centres, school and university counselling, and the public web.
+
+**Measurable harm prevented.**
+- About 6,200 job-related fraud cases are reported each year: about 4,700 to SLBFE (2025) and about 1,440 CERT financial-fraud complaints (2024).
+- SLBFE alone recovered more than Rs. 374M for victims in 2025, and individual losses reach Rs. 13M.
+- Preventing even **10% of reported cases**, at a conservative Rs. 1M average loss, avoids **about Rs. 500M of losses a year**. Reported cases are a lower bound, because most victims never report.
+- What we would measure in a pilot:
+  - warnings shown before payment
+  - the share of high-risk offers later confirmed as scams by analysts
+  - time from a new scam tactic appearing to a drift alert
+  - complaints per 1,000 departures in pilot districts
+
+**Path to adoption.**
+1. **Pilot (3 months): triage tool for SLBFE's investigations team or Sri Lanka CERT.** Analysts already receive these complaints. Our console ranks them, checks agency and fee claims, and flags new tactics. It runs on one small server with Docker, and no data leaves the institution.
+2. **Public checker:** web and WhatsApp-style "check this offer" links from SLBFE, CERT and CBSL's "Be Scam Proof" pages. Any site or assistant can integrate through the REST API or the MCP tool.
+3. **Scale:** pre-departure training centres and job centres use it with first-time applicants. The official licensed-agency list replaces the demo registry, and analyst-confirmed reports keep the model current.
+
+## Limitations
+
+- The agency registry is a **fictional demo**. Real licence checks need SLBFE's licensed-agency list.
+- `fee_rules.json` uses Rs. 450,000 as the highest published fee cap. Current SLBFE job orders go higher: approved Japan SSW orders list a maximum of about Rs. 1.12M (approved Nov 2025). Legitimate high-fee job orders can therefore be marked as contradicted until the cap is updated or checked per job order.
+- Much of the Sri Lankan training data is synthetic, and Sinhala and Singlish precision is lower (0.64–0.69). Analyst-confirmed labels from the review queue are the route to real-world data.
+- Mixed traffic with only about 25% new-tactic offers is detected in 20% of windows, so early drift is caught later than full drift.
+- The verifier is deterministic (registry and rule checks). There is no LLM claim checker yet.
+- Image (screenshot) OCR and voice-note transcription are not implemented. Text, links and PDFs are.
