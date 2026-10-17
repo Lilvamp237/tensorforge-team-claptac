@@ -45,6 +45,7 @@ class ScanResult(BaseModel):
     source: Literal["text", "url", "file", "collector"]
     url: str | None = None
     risk: Risk
+    model_probability: float | None = None  # text-model score before the official-record adjustment
     needs_review: bool
     content: Content
     indicators: list[str]
