@@ -115,11 +115,20 @@ class UserReport(BaseModel):
     url: str = Field(min_length=3, max_length=2_000)
     verdict: Literal["scam", "legit"]
     comment: str = Field(default="", max_length=500)
+    rater_id: str | None = Field(default=None, max_length=100)  # stored only as a salted hash
 
 
 @app.post("/api/v1/reports")
 def report_site(body: UserReport):
-    return reputation.add_report(body.url, body.verdict, body.comment)
+    return reputation.add_report(body.url, body.verdict, body.comment, body.rater_id)
+
+
+@app.post("/api/v1/raters/{rater_id}/verify")
+def verify_rater(rater_id: str):
+    """Analyst grants verified-rater status (NGOs, job-centre officers, SLBFE-registered workers)."""
+    from .community import verify_rater as grant
+
+    return grant(rater_id)
 
 
 @app.get("/api/v1/reputation")
