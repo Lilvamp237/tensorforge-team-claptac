@@ -5,7 +5,7 @@ from typing import Literal
 from fastapi import FastAPI, HTTPException, UploadFile
 from pydantic import BaseModel, Field, HttpUrl
 
-from . import __version__, reputation
+from . import __version__, reputation, retrain as retrain_loop
 from .drift import drift_report
 from .fetch import UnsafeURL
 from .monitoring import pending_reviews, read_alerts
@@ -87,9 +87,31 @@ def reputation_lists():
     return reputation.lists()
 
 
-@app.post("/api/v1/retrain")
+@app.post("/api/v1/retrain", status_code=202)
 def retrain():
-    return trigger_retrain()
+    """Start export -> train -> calibrate -> evaluate -> gate -> promote/reject in the background."""
+    return trigger_retrain("api")
+
+
+@app.get("/api/v1/retrain/{job_id}")
+def retrain_job(job_id: str):
+    job = retrain_loop.job_status(job_id)
+    if job is None:
+        raise HTTPException(404, "No retrain job with that id")
+    return job
+
+
+@app.get("/api/v1/models")
+def list_models():
+    return retrain_loop.status()
+
+
+@app.post("/api/v1/models/rollback")
+def rollback_model():
+    result = retrain_loop.rollback()
+    if not result["rolled_back"]:
+        raise HTTPException(409, result["reason"])
+    return result
 
 
 @app.post("/api/v1/model/reload")

@@ -9,19 +9,30 @@
 4. Check on data the thresholds never saw: false-alarm rate on half B windows, detection rate on shifted windows and
    on mixed windows (50% and 25% shifted).
 Writes models/novelty.joblib, models/drift_reference.json and reports/drift_calibration.json.
+With SAFEPASSAGE_MODEL_DIR set, reads the models from and writes all three files to that directory instead.
 """
 
 import json
+import os
+from pathlib import Path
 
 import joblib
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from safepassage import extract
 from safepassage.config import DATA_DIR, MODEL_PATH, NOVELTY_THRESHOLD, REPORTS_DIR
 from safepassage.drift import REFERENCE_PATH, compute_signals, reference_from_rows, triggered
 from safepassage.extract import classify_category, detect_language
 from safepassage.novelty import NOVELTY_PATH, NoveltyIndex
+
+MODEL_DIR = os.environ.get("SAFEPASSAGE_MODEL_DIR")
+if MODEL_DIR:  # candidate models: read and write everything inside that directory
+    MODEL_DIR = Path(MODEL_DIR)
+    MODEL_PATH, NOVELTY_PATH, REFERENCE_PATH = (MODEL_DIR / p.name for p in (MODEL_PATH, NOVELTY_PATH, REFERENCE_PATH))
+    extract.CATEGORY_PATH = MODEL_DIR / extract.CATEGORY_PATH.name
+    REPORTS_DIR = MODEL_DIR
 
 WINDOW = 200
 N_WINDOWS = 300

@@ -142,6 +142,23 @@ python -m pytest -q
 
 Alerts fire only when the drift state changes, after at least 20 scans. The state is kept in `logs/alerts.jsonl`, so the API, web app and scripts all agree.
 
+### Retraining
+
+**Where new data comes from**
+
+1. Review-queue items an analyst marks scam or legit (medium-risk, novel, and while drifting, high-risk scans).
+2. User reports on sites, but only after an analyst confirms them in the queue.
+3. The public-listing collector. Its items are unlabelled. They feed the drift monitor, and the most uncertain or novel ones reach the review queue (active learning), where an analyst labels them.
+4. Official scam warnings (e.g. SLBFE, police), added by hand as confirmed examples.
+
+**The loop** (`src/safepassage/retrain.py`): export confirmed labels to `data/processed/feedback.csv` → train a candidate in `models/versions/<UTC timestamp>/` (analyst labels override training rows with the same text) → recalibrate the novelty index and drift reference for that candidate → evaluate it and the production model on the held-out test set (and `data/handwritten.csv` if present, test-only). Each heavy step runs in a subprocess, so a crash can't take the API down.
+
+**Promotion gate:** the candidate is promoted only if held-out F1 and recall are each at most 0.02 below production, and recall on the real handwritten set does not drop. A promoted version is copied into `models/` file by file with atomic replaces, `models/CURRENT_VERSION` is updated, and the API hot-reloads the model, novelty index, drift reference and category model. Rejected candidates stay on disk for audit. Every run raises a `retrain_promoted`, `retrain_rejected` or `retrain_failed` alert and is logged to `logs/retrain_history.jsonl`. `POST /api/v1/models/rollback` (or the analyst-console button) restores the previous version.
+
+**Schedule:** `python -m safepassage.scheduler --interval-min 60 --min-new-labels 20` retrains when at least 20 new confirmed labels exist, or when drift is active and at least 5 do. Use `--once --force` to retrain right now. Otherwise each tick logs `skip` with the reason. `POST /api/v1/retrain` starts the same loop in the background (202 + job id), and `GET /api/v1/models` shows versions, the current model and retrain history.
+
+**Why raw user reports never train the model:** anyone can submit a report. If reports trained the model, a scammer could file "legit" reports on their own offers, or a rival could flood reports, and so teach it the wrong answer (data poisoning). Reports only queue items for an analyst. Only analyst decisions become labels, and the gate is a second check against a bad batch.
+
 ## Data sources and licences
 
 No real personal data is used anywhere (Rule 2.4, PDPA No. 9 of 2022). No private groups or chats are scraped.
