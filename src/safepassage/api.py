@@ -8,10 +8,11 @@ from pydantic import BaseModel, Field, HttpUrl
 from . import __version__, reputation
 from .drift import drift_report
 from .fetch import UnsafeURL
+from .media import MediaError
 from .monitoring import pending_reviews, read_alerts
 from .response import trigger_retrain
 from .schema import ScanResult
-from .service import model_loaded, reload_model, scan_file, scan_public_url, scan_text
+from .service import MediaScan, model_loaded, reload_model, scan_audio, scan_file, scan_public_url, scan_text
 
 app = FastAPI(title="SafePassage LK", version=__version__)
 
@@ -46,6 +47,33 @@ def scan_url_endpoint(req: URLScanRequest):
 @app.post("/api/v1/scans/file", response_model=ScanResult)
 async def scan_file_endpoint(file: UploadFile):
     return scan_file(await file.read(), file.filename or "upload.txt")
+
+
+MAX_MEDIA_BYTES = 10 * 1024 * 1024
+
+
+class MediaScanResult(ScanResult):
+    extracted_text: str  # what we heard (audio) or read (image)
+
+
+async def _read_media(file: UploadFile) -> bytes:
+    data = await file.read(MAX_MEDIA_BYTES + 1)
+    if len(data) > MAX_MEDIA_BYTES:
+        raise HTTPException(413, "File too large (limit 10 MB)")
+    return data
+
+
+def _media_response(scan: MediaScan) -> MediaScanResult:
+    return MediaScanResult(**scan.result.model_dump(), extracted_text=scan.text)
+
+
+@app.post("/api/v1/scans/audio", response_model=MediaScanResult)
+async def scan_audio_endpoint(file: UploadFile, language: str | None = None):
+    """Voice note (mp3/wav/m4a/ogg, up to 3 min). `language` is an optional hint: en, ta or si."""
+    try:
+        return _media_response(scan_audio(await _read_media(file), file.filename or "upload.wav", language))
+    except MediaError as e:
+        raise HTTPException(422, str(e))
 
 
 @app.get("/api/v1/drift")
