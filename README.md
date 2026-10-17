@@ -126,7 +126,8 @@ Choose transport **Streamable HTTP** and URL `http://localhost:8001/mcp`, then c
 | GET | `/api/v1/drift` | Current drift signals |
 | GET | `/api/v1/alerts` | Alert history |
 | GET / POST | `/api/v1/reviews`, `/api/v1/reviews/{id}` | Review queue and analyst decisions |
-| POST | `/api/v1/reports` | User report on a site |
+| POST | `/api/v1/reports` | User report on a site (optional `rater_id`, stored only as a salted hash) |
+| POST | `/api/v1/raters/{rater_id}/verify` | Analyst grants verified-rater status |
 | GET | `/api/v1/reputation` | Site allow / block lists |
 | POST | `/api/v1/retrain`, `/api/v1/model/reload` | Retrain on confirmed labels, hot-swap the model |
 
@@ -164,6 +165,14 @@ Alerts fire only when the drift state changes, after at least 20 scans. The stat
 **Schedule:** `python -m safepassage.scheduler --interval-min 60 --min-new-labels 20` retrains when at least 20 new confirmed labels exist, or when drift is active and at least 5 do. Use `--once --force` to retrain right now. Otherwise each tick logs `skip` with the reason. `POST /api/v1/retrain` starts the same loop in the background (202 + job id), and `GET /api/v1/models` shows versions, the current model and retrain history.
 
 **Why raw user reports never train the model:** anyone can submit a report. If reports trained the model, a scammer could file "legit" reports on their own offers, or a rival could flood reports, and so teach it the wrong answer (data poisoning). Reports only queue items for an analyst. Only analyst decisions become labels, and the gate is a second check against a bad batch.
+
+### Community signal (`src/safepassage/community.py`)
+
+Users can rate a site as scam or legit. Ratings nudge the score but never decide it:
+- **Trust-weighted.** Raters an analyst has verified (NGOs, job-centre officers, SLBFE-registered workers) count 1.0; everyone else counts 0.25. The weight then scales with how often the rater's past reports agreed with analyst decisions, so careful raters gain influence and careless ones lose it.
+- **Capped and smoothed.** A Bayesian average with a neutral prior means a handful of ratings barely moves the score, and the total effect is capped at **±0.15**. A sudden burst of reports on one site freezes the signal for review (possible brigading).
+- **Graded standing, from facts only.** The result shows "SLBFE records: licensed agency" or "licence cancelled or suspended", "Reported, under review", "Verified by analyst" or "Confirmed scam". Votes alone never label a site fake.
+- **Analyst-only list changes.** Only an analyst decision moves a site onto the allow or block list. Rater ids are stored only as salted hashes.
 
 ## Data sources and licences
 
@@ -242,6 +251,10 @@ The current settings are MEDIUM_RISK 0.4, which goes to human review, and HIGH_R
 
 Simulated annealing and a genetic algorithm (both written from scratch) were compared with random search and the default config. Each had the same 40-evaluation budget, was repeated over **3 seeds**, and was scored with grouped cross-validation on training data only (current data). On cross-validation the GA scored highest (CV F1 0.938 ± 0.001; random 0.935 ± 0.002; SA 0.927 ± 0.014, one weak seed; default 0.923). **None beat the default on held-out data**: test F1 0.805 (random), 0.803 (SA) and 0.801 (GA) against 0.808 for the default, all inside the paired 95% confidence interval, and the tuned configs have lower AUC (0.91–0.93 vs 0.94). The cross-validation gains come from overfitting the partly synthetic training distribution, so we keep the default configuration.
 
+### Stacking meta-model (`reports/stacker.json`, off by default)
+
+A small logistic regression that combines the text score with the red flags and the official-record checks (agency matched, contradicted claims, fee within the job-order cap). It is trained on out-of-fold text scores, and its threshold is picked on validation. At threshold 0.5 it missed fewer scams on held-out data (50 vs 80 of 555) and on the real-world set (4 vs 8 of 30), but raised more false alarms (170 vs 145 held-out; 15 vs 9 of 30 real legit ads) and **broke on the shifted set** (missed scams 30 → 84 of 499). Like SA and GA tuning, it did not beat the simpler model overall, so it stays off (`SAFEPASSAGE_STACKER=1` turns it on).
+
 ### Shifted set (n = 800): new tactics
 
 | Tactic | n | Accuracy | Recall | Mean confidence |
@@ -315,6 +328,7 @@ Every one of these people passes through channels we can sit in: SLBFE registrat
 - Much of the Sri Lankan training data is synthetic. On the 60-ad real-world set the model still flags 30% of real legitimate ads (down from 60%), and 27 of its 30 scam rows are reconstructions, not real ads. The 89 real legit training ads come mostly from two agencies. Analyst-confirmed labels from the review queue are the route to real-world data.
 - Mixed traffic with only about 25% new-tactic offers is detected in 35% of windows, so early drift is caught later than full drift.
 - The verifier is deterministic (registry and rule checks). There is no LLM claim checker yet.
+- The analyst endpoints (review decisions, verified raters, retrain, rollback) have no authentication in this build. A deployment needs an analyst login, and `SAFEPASSAGE_RATER_SALT` set to a secret (the default salt is public, so hashed rater ids could be guessed).
 - Screenshots are read with Tesseract. English is reliable; **Sinhala OCR makes character-level mistakes** (e.g. a vowel sign or conjunct misread), so some Sinhala red-flag phrases can be missed. The Docker image includes the English, Sinhala and Tamil packs; a local install needs them added. Uploaded images are never stored.
 - Voice notes are transcribed with Whisper *small* on CPU. It handles English and Tamil reasonably but is **weak on Sinhala**, so Sinhala voice notes may be scored on a poor transcript; the transcript is shown to the user and kept in the review queue so analysts can see what was heard. Uploaded audio is never stored.
 
