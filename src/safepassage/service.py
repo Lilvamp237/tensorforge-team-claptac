@@ -3,7 +3,7 @@
 import uuid
 from typing import NamedTuple
 
-from . import config, reputation, trust
+from . import community, config, reputation, stacker, trust
 from .config import MODEL_PATH, NOVELTY_THRESHOLD
 from .extract import extract_content
 from .features import describe, find_red_flags
@@ -35,7 +35,7 @@ def reload_model() -> bool:
     global _model, _loaded_stamp
     from . import drift, extract, novelty as novelty_module
 
-    for cached in (novelty_module._index, drift.load_reference, extract._category_model):
+    for cached in (novelty_module._index, drift.load_reference, extract._category_model, stacker.load):
         getattr(cached, "cache_clear", lambda: None)()  # tests may swap these for plain functions
     _loaded_stamp = _version_stamp()
     _model = ScamModel() if MODEL_PATH.exists() else None
@@ -54,9 +54,19 @@ def scan_text(text: str, source: str = "text", url: str | None = None, media: st
 
     content = extract_content(text)
     verification = verify(text, content)
-    if config.TRUST_ADJUSTMENT:
+    combined = stacker.score(p, flags, verification) if _model and config.USE_STACKER else None
+    if combined is not None:
+        # The stacking meta-model combines the text score, red flags and official records into one probability.
+        p = combined
+    elif config.TRUST_ADJUSTMENT:
         p, trust_notes = trust.adjust(p, verification, flags)
         indicators = trust_notes + indicators
+
+    shift, community_note = community.signal(url)
+    if community_note:
+        p = min(max(p + shift, 0.0), 1.0)
+        indicators.insert(0, community_note)
+    indicators = community.standing(url, verification) + indicators
 
     # Analyst decisions come last, so a blocklisted site stays high risk even if its agency verifies.
     listing = reputation.status(url) if url else None

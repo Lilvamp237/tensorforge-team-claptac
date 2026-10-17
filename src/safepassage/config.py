@@ -35,6 +35,9 @@ ALERT_WEBHOOK_URL = os.environ.get("ALERT_WEBHOOK_URL")
 # Official-record trust adjustment (trust.py). Off until demo licence numbers stop clashing with the real registry;
 # measured with scripts/evaluate_service.py.
 TRUST_ADJUSTMENT = os.environ.get("SAFEPASSAGE_TRUST", "0") == "1"
+# Stacking meta-model (stacker.py). Off: it cut missed scams but doubled false alarms on real ads and broke on
+# the shifted set (reports/stacker.json).
+USE_STACKER = os.environ.get("SAFEPASSAGE_STACKER", "0") == "1"
 
 # Community reports: this many scam reports on one site puts it in the analyst queue (never auto-listed).
 REPORT_THRESHOLD = 3
