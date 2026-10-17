@@ -2,35 +2,35 @@
   "window": 200,
   "n_windows": 300,
   "thresholds": {
-    "language_psi": 0.8748,
-    "category_psi": 0.3047,
-    "confidence_drop": 0.0328,
-    "novelty_share": 0.08
+    "language_psi": 0.87,
+    "category_psi": 0.2897,
+    "confidence_drop": 0.0362,
+    "novelty_share": 0.0988
   },
   "separation": {
     "language_psi": {
-      "normal_p99": 0.0473,
-      "shifted_median": 3.3573
+      "normal_p99": 0.0476,
+      "shifted_median": 3.3371
     },
     "category_psi": {
-      "normal_p99": 0.0651,
-      "shifted_median": 1.0236
+      "normal_p99": 0.0678,
+      "shifted_median": 0.9556
     },
     "confidence_drop": {
-      "normal_p99": 0.0186,
-      "shifted_median": 0.0753
+      "normal_p99": 0.0205,
+      "shifted_median": 0.0834
     },
     "novelty_share": {
-      "normal_p99": 0.02,
-      "shifted_median": 0.26
+      "normal_p99": 0.025,
+      "shifted_median": 0.32
     }
   },
   "false_alarm_rate_heldout_test": {
-    "any": 0.0,
+    "any": 0.003,
     "per_signal": {
       "language_psi": 0.0,
       "category_psi": 0.0,
-      "confidence_drop": 0.0,
+      "confidence_drop": 0.003,
       "novelty_share": 0.0
     }
   },
@@ -47,34 +47,34 @@
     "any": 1.0,
     "per_signal": {
       "language_psi": 1.0,
-      "category_psi": 0.007,
-      "confidence_drop": 0.587,
+      "category_psi": 0.0,
+      "confidence_drop": 0.83,
       "novelty_share": 1.0
     }
   },
   "detection_rate_mixed_25pct_shifted": {
-    "any": 0.263,
+    "any": 0.33,
     "per_signal": {
-      "language_psi": 0.07,
+      "language_psi": 0.103,
       "category_psi": 0.0,
-      "confidence_drop": 0.05,
-      "novelty_share": 0.193
+      "confidence_drop": 0.123,
+      "novelty_share": 0.207
     }
   },
   "full_set_signals": {
     "heldout_test": {
-      "language_psi": 0.0002,
-      "category_psi": 0.0106,
-      "mean_confidence": 0.8978,
-      "confidence_drop": -0.0027,
-      "novelty_share": 0.0024
+      "language_psi": 0.0005,
+      "category_psi": 0.0156,
+      "mean_confidence": 0.891,
+      "confidence_drop": 0.007,
+      "novelty_share": 0.0035
     },
     "shifted": {
-      "language_psi": 3.3228,
-      "category_psi": 1.0029,
-      "mean_confidence": 0.8199,
-      "confidence_drop": 0.0753,
-      "novelty_share": 0.2625
+      "language_psi": 3.3333,
+      "category_psi": 0.9465,
+      "mean_confidence": 0.815,
+      "confidence_drop": 0.0829,
+      "novelty_share": 0.32
     }
   }
 }
