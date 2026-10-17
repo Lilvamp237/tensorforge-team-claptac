@@ -11,6 +11,7 @@ import os
 
 import requests
 from mcp.server import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
 from .fetch import UnsafeURL
 from .service import scan_public_url
@@ -32,9 +33,9 @@ def check_opportunity_url(url: str) -> dict:
     try:
         return scan_public_url(url).model_dump()
     except UnsafeURL as e:
-        raise ValueError(f"URL not allowed: {e}")
+        raise ToolError(f"URL not allowed: {e}")
     except requests.RequestException as e:
-        raise ValueError(f"Could not fetch the page: {e.__class__.__name__}")
+        raise ToolError(f"Could not fetch the page: {e.__class__.__name__}")
 
 
 def main():
