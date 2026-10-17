@@ -56,3 +56,8 @@ def test_standing_uses_official_facts_and_analyst_decisions_only():
     assert standing(None, cancelled) == ["SLBFE records: licence cancelled or suspended"]
     rate(3)  # reports alone only mark the site as under review, never as a scam
     assert "Reported, under review" in standing(SITE, Verification())
+
+
+def test_blank_rater_id_is_anonymous():
+    reputation.add_report(SITE, "scam", rater_id=None)
+    assert reputation.reports()[0]["rater"] is None
