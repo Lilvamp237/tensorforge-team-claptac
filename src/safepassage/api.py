@@ -8,11 +8,12 @@ from pydantic import BaseModel, Field, HttpUrl
 from . import __version__, reputation, retrain as retrain_loop
 from .drift import drift_report
 from .fetch import UnsafeURL
-from .media import MediaError
+from .media import MediaError, is_image
 from .monitoring import pending_reviews, read_alerts
 from .response import trigger_retrain
 from .schema import ScanResult
-from .service import MediaScan, model_loaded, reload_model, scan_audio, scan_file, scan_public_url, scan_text
+from .service import (MediaScan, model_loaded, reload_model, scan_audio, scan_file, scan_image, scan_public_url,
+                      scan_text)
 
 app = FastAPI(title="SafePassage LK", version=__version__)
 
@@ -72,6 +73,17 @@ async def scan_audio_endpoint(file: UploadFile, language: str | None = None):
     """Voice note (mp3/wav/m4a/ogg, up to 3 min). `language` is an optional hint: en, ta or si."""
     try:
         return _media_response(scan_audio(await _read_media(file), file.filename or "upload.wav", language))
+    except MediaError as e:
+        raise HTTPException(422, str(e))
+
+
+@app.post("/api/v1/scans/image", response_model=MediaScanResult)
+async def scan_image_endpoint(file: UploadFile):
+    """Screenshot or photo of an offer (png/jpg). Text is read with Tesseract (English, Sinhala, Tamil)."""
+    if not is_image(file.filename or ""):
+        raise HTTPException(422, "Unsupported image type. Use png, jpg or jpeg.")
+    try:
+        return _media_response(scan_image(await _read_media(file)))
     except MediaError as e:
         raise HTTPException(422, str(e))
 
