@@ -9,10 +9,10 @@ _LOAD_REGISTRY = V.load_registry.__wrapped__
 JO = "https://applications.slbfe.lk/jobbank/jsearchdisplay_an_m.asp?an="
 # Small fixture job orders (same columns as data/kb/slbfe_job_orders.csv); licences match the demo registry.
 JOB_ORDERS = pd.DataFrame([
-    ["1023", "Qatar", "Welder", 300000, "2026-01-10", "2099-01-09", JO + "1023"],
-    ["1023", "Japan", "Specified Skilled Worker (SSW) -Nursing Care", 1119985, "2025-11-27", "2099-11-26", JO + "1023"],
-    ["1023", "Japan", "Specified Skilled Worker (SSW) -Agriculture", 5000000, "2018-01-01", "2020-01-01", JO + "1023"],
-    ["1187", "U A E", "Driver - Heavy Vehicle", 1500000, "2026-03-01", "2099-03-01", JO + "1187"],
+    ["9023", "Qatar", "Welder", 300000, "2026-01-10", "2099-01-09", JO + "9023"],
+    ["9023", "Japan", "Specified Skilled Worker (SSW) -Nursing Care", 1119985, "2025-11-27", "2099-11-26", JO + "9023"],
+    ["9023", "Japan", "Specified Skilled Worker (SSW) -Agriculture", 5000000, "2018-01-01", "2020-01-01", JO + "9023"],
+    ["9187", "U A E", "Driver - Heavy Vehicle", 1500000, "2026-03-01", "2099-03-01", JO + "9187"],
 ], columns=["licence_no", "country", "job_title", "max_fee_lkr", "approved_date", "valid_until", "source"])
 
 
@@ -31,19 +31,19 @@ def run(text):
 
 
 def test_licensed_agency_and_registration_fee():
-    status, _, v = run("Lanka Bright Overseas (Pvt) Ltd, SLBFE licence no. 1023. Welders for Qatar. "
+    status, _, v = run("Lanka Bright Overseas (Pvt) Ltd, SLBFE licence no. 9023. Welders for Qatar. "
                        "Only the SLBFE registration fee of Rs. 22,027 is payable.")
     assert status == "matched"
     assert all(c.status == "consistent" for c in v.claims)
 
 
 def test_borrowed_licence_number_is_contradicted():
-    status, claims, _ = run("Ceylon Horizon Manpower licence 2051 - staff nurse jobs in Japan.")
+    status, claims, _ = run("Ceylon Horizon Manpower licence 9051 - staff nurse jobs in Japan.")
     assert status == "not_matched" and ("contradicted", "Licence") in claims
 
 
 def test_suspended_agency():
-    status, claims, _ = run("Island Star Recruiters licence 0987: drivers for Dubai.")
+    status, claims, _ = run("Island Star Recruiters licence 9987: drivers for Dubai.")
     assert status == "not_matched" and ("contradicted", "Agency") in claims
 
 
@@ -77,33 +77,33 @@ def fee_claims(v):
 
 
 def test_fee_above_job_order_maximum_is_contradicted():
-    status, _, v = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 1023. Welders for Qatar. Agency fee Rs. 350,000.")
+    status, _, v = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 9023. Welders for Qatar. Agency fee Rs. 350,000.")
     [fee] = fee_claims(v)
     assert status == "matched" and fee.status == "contradicted"
-    assert "Rs. 300,000" in fee.source and JO + "1023" in fee.source
+    assert "Rs. 300,000" in fee.source and JO + "9023" in fee.source
 
 
 def test_fee_within_job_order_maximum_is_consistent():
-    _, _, v = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 1023. Nursing care workers for Japan. "
+    _, _, v = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 9023. Nursing care workers for Japan. "
                   "Agency fee Rs. 1,000,000.")
     [fee] = fee_claims(v)
     assert fee.status == "consistent" and "Nursing Care" in fee.source
 
 
 def test_job_order_country_alias_and_exact_cap():
-    _, _, v = run("Ceylon Horizon Manpower licence 1187. Heavy vehicle drivers for Dubai. Service fee Rs. 1,500,000.")
+    _, _, v = run("Ceylon Horizon Manpower licence 9187. Heavy vehicle drivers for Dubai. Service fee Rs. 1,500,000.")
     [fee] = fee_claims(v)
     assert fee.status == "consistent" and "Driver - Heavy Vehicle" in fee.source
 
 
 def test_no_job_order_for_that_country_falls_back_to_global_cap():
-    _, claims, _ = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 1023. Welders for Oman. Agency fee Rs. 350,000.")
+    _, claims, _ = run("Lanka Bright Overseas (Pvt) Ltd, licence no. 9023. Welders for Oman. Agency fee Rs. 350,000.")
     assert ("unverifiable", "Fee") in claims
 
 
 def test_global_cap_is_highest_currently_valid_job_order():
     value, source = V.highest_valid_cap(JOB_ORDERS)
-    assert value == 1500000 and source == JO + "1187"  # the expired Rs. 5,000,000 order is ignored
+    assert value == 1500000 and source == JO + "9187"  # the expired Rs. 5,000,000 order is ignored
     _, _, v = run("Drivers for Dubai, processing fee Rs. 1,600,000.")
     [fee] = fee_claims(v)
     assert fee.status == "contradicted" and "Rs. 1,500,000" in fee.source
@@ -118,4 +118,18 @@ def test_registry_prefers_slbfe_list_over_demo(tmp_path, monkeypatch):
     monkeypatch.setattr(V, "REGISTRY_PATH", demo_copy)  # a stale copy of the demo list must not win
     assert list(_LOAD_REGISTRY()["licence_no"]) == ["3532"]
     monkeypatch.setattr(V, "SLBFE_REGISTRY", tmp_path / "missing.csv")
-    assert "1023" in set(_LOAD_REGISTRY()["licence_no"])  # demo is the last fallback
+    assert "9023" in set(_LOAD_REGISTRY()["licence_no"])  # demo is the last fallback
+
+
+def test_demo_licences_never_clash_with_real_agencies():
+    """Synthetic / demo licence numbers must not belong to a real SLBFE agency, or a demo offer would be shown as
+    borrowing a real (possibly cancelled) agency's licence."""
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    real = set(pd.read_csv(root / "data" / "kb" / "slbfe_registry.csv", dtype=str)["licence_no"].str.lstrip("0"))
+    demo = set(pd.read_csv(root / "data" / "kb" / "registry_demo.csv", dtype=str)["licence_no"].str.lstrip("0"))
+    src = (root / "scripts" / "generate_synthetic.py").read_text(encoding="utf-8")
+    generated = {n.lstrip("0") for n in re.findall(r'"(\d{4})"', src)}
+    assert not (demo | generated) & real
