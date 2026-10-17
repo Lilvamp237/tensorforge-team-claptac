@@ -10,8 +10,8 @@ from safepassage import reputation
 from safepassage.fetch import UnsafeURL
 from safepassage.monitoring import pending_reviews, read_alerts, read_log
 from safepassage.response import check_drift, trigger_retrain
-from safepassage.media import AUDIO_EXTENSIONS, MediaError, is_audio
-from safepassage.service import reload_model, scan_audio, scan_file, scan_public_url, scan_text
+from safepassage.media import AUDIO_EXTENSIONS, IMAGE_EXTENSIONS, MediaError, is_audio, is_image
+from safepassage.service import reload_model, scan_audio, scan_file, scan_image, scan_public_url, scan_text
 
 st.set_page_config(page_title="SafePassage LK", layout="wide")
 scan_tab, dash_tab, analyst_tab = st.tabs(["Check an offer", "Monitoring", "Analyst console"])
@@ -21,8 +21,8 @@ with scan_tab:
     st.caption("Check a job, study or visa offer before you pay. Risk assessment only, not a fraud determination.")
     text = st.text_area("Paste the offer or message")
     url = st.text_input("...or a public link")
-    upload = st.file_uploader("...or upload a letter (PDF/TXT) or a voice note (MP3/WAV/M4A/OGG)",
-                              type=["pdf", "txt"] + [e.lstrip(".") for e in AUDIO_EXTENSIONS])
+    upload = st.file_uploader("...or upload a letter (PDF/TXT), a screenshot (PNG/JPG) or a voice note (MP3/WAV/M4A/OGG)",
+                              type=["pdf", "txt"] + [e.lstrip(".") for e in AUDIO_EXTENSIONS + IMAGE_EXTENSIONS])
     hint = st.selectbox("Voice note language", ["Auto-detect", "English", "Tamil", "Sinhala"],
                         help="Optional. Transcription is weaker for Sinhala.")
     if st.button("Check", type="primary"):
@@ -33,6 +33,11 @@ with scan_tab:
                 with st.spinner("Listening... (the first voice note downloads the speech model, about 460 MB)"):
                     scan = scan_audio(upload.read(), upload.name, lang)
                 st.session_state.extracted = ("What we heard", scan.text)
+                st.session_state.result = scan.result
+            elif upload and is_image(upload.name):
+                with st.spinner("Reading the image..."):
+                    scan = scan_image(upload.read())
+                st.session_state.extracted = ("What we read", scan.text)
                 st.session_state.result = scan.result
             elif upload:
                 st.session_state.result = scan_file(upload.read(), upload.name)
