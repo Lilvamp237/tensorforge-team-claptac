@@ -162,6 +162,9 @@ POOLS = {
                           "Training will be provided at the {country} branch.",
                           "Walk-in interview from 9 am to 3 pm."],
         },
+        "contact": ["Call or WhatsApp 07X XXX XXXX.", "{agency}, Tel: 011 XXX XXXX.", "Email: jobs@example.lk",
+                    "Visit our office in {country}.", "Hotline 07X XXX XXXX.", "Inbox us for details.",
+                    "{agency} - call 07X XXX XXXX.", "More info: 011 XXX XXXX / 07X XXX XXXX."],
         "neutral": ["Contact us on WhatsApp 07X XXX XXXX.", "Limited vacancies.", "Call 07X XXX XXXX for details.",
                     "Apply early.", "Male and female candidates can apply.", "Age 21 - 45."],
         "close": {
@@ -235,6 +238,8 @@ POOLS = {
             "local_job": ["EPF ETF thiyenawa.", "CV eka HR ekata email karanna.",
                           "O/L pass wela thiyenna ona."],
         },
+        "contact": ["Call / WhatsApp 07X XXX XXXX.", "{agency}, Tel 011 XXX XXXX.", "Inbox karanna.",
+                    "Office ekata enna, {country}.", "Email: jobs@example.lk"],
         "neutral": ["WhatsApp 07X XXX XXXX.", "Call karanna 07X XXX XXXX.", "Purappadu tikai.",
                     "Pirimi gahanu dennatama puluwan."],
         "close": {
@@ -305,6 +310,8 @@ POOLS = {
             "local_job": ["EPF/ETF ලබා දේ.", "ඔබේ CV එක මානව සම්පත් අංශයට එවන්න.",
                           "සා/පෙළ සමත් විය යුතුය."],
         },
+        "contact": ["අමතන්න / WhatsApp 07X XXX XXXX.", "{agency}, දුරකථන 011 XXX XXXX.", "Inbox කරන්න.",
+                    "Email: jobs@example.lk"],
         "neutral": ["WhatsApp 07X XXX XXXX.", "විස්තර සඳහා අමතන්න 07X XXX XXXX.", "පුරප්පාඩු සීමිතයි."],
         "close": {
             "scam": ["දැන්ම අමතන්න 07X XXX XXXX!!!", "Inbox කරන්න.", "Viber 07X XXX XXXX."],
@@ -328,8 +335,8 @@ TAMIL = {
              "இன்றே பதிவு செய்யுங்கள், இடங்கள் குறைவு.", "கடவுச்சீட்டு நகலை WhatsApp இல் அனுப்பவும்."],
     "legit": ["SLBFE அனுமதி பெற்ற முகவர் நிலையம், உரிமம் இல. {lic}.", "முன்பணம் எதுவும் செலுத்த வேண்டியதில்லை.",
               "நேர்முகத் தேர்வு {day} அன்று எமது அலுவலகத்தில்.", "அசல் சான்றிதழ்களை கொண்டு வரவும்."],
-    "close": {"scam": ["உடனே அழைக்கவும் 07X XXX XXXX!!!", "WhatsApp: 07X XXX XXXX"],
-              "legit": ["{agency}, தொலைபேசி 011 XXX XXXX.", "மின்னஞ்சல்: careers@example.lk"]},
+    "contact": ["தொடர்புக்கு 07X XXX XXXX.", "மேலதிக விபரங்களுக்கு அழைக்கவும் 07X XXX XXXX.",
+                "எமது அலுவலகத்திற்கு வரவும்."],
 }
 NEW_TACTICS = {  # tactic -> (category, scam lines)
     "crypto_payment": ("foreign_job", [
@@ -375,7 +382,9 @@ def _fill(template: str, rng: random.Random, cat: str, label: str, country=None)
     values = {
         "country": country or rng.choice(slots["country"]),
         "job": rng.choice(slots["job"]),
-        "salary": rng.choice((SCAM_SALARY if label == "scam" else LEGIT_SALARY)[cat]),
+        # Salary pools overlap (30%) so the amount alone cannot give the label away.
+        "salary": rng.choice(((SCAM_SALARY if label == "scam" else LEGIT_SALARY) if rng.random() < 0.7
+                              else (LEGIT_SALARY if label == "scam" else SCAM_SALARY))[cat]),
         "fee": rng.choice(SCAM_FEE),
         "legit_fee": rng.choice(LEGIT_FEE),
         "agency": rng.choice(AGENCY),
@@ -385,10 +394,14 @@ def _fill(template: str, rng: random.Random, cat: str, label: str, country=None)
     return template.format(**values)
 
 
-def _render(parts: list[str], rng: random.Random, cat: str, label: str, country=None) -> str:
+def _render(parts: list[str], rng: random.Random, cat: str, label: str, country=None, salary=None) -> str:
     country = country or rng.choice(SLOTS[cat]["country"])
     sep = rng.choice([" ", "\n", " ", " | "])
     text = sep.join(_fill(p, rng, cat, label, country) for p in parts)
+    if salary:  # shifted set: amounts written in a format the model has never seen
+        for pool in (SCAM_SALARY, LEGIT_SALARY):
+            for v in pool[cat]:
+                text = text.replace(v, salary)
     if rng.random() < 0.3:
         text = rng.choice(["✈️ ", "📢 ", "🔥 ", "⭐ ", "🇱🇰 "]) + text
     return text
@@ -405,16 +418,15 @@ def compose(rng: random.Random, lang: str, label: str, cat: str, split: str) -> 
     if cat == "local_job":  # visa / flight lines make no sense for a local job
         generic = [g for g in generic if not any(w in g.lower() for w in ("visa", "වීසා", "fly"))]
     pool = _split_pool(P[label][cat] + generic, split, rng)
-    k = rng.randint(2, 4) if label == "scam" else rng.randint(2, 3)
+    k = rng.randint(1, 3) if label == "scam" else rng.randint(2, 3)
     parts += rng.sample(pool, min(k, len(pool)))
-    # Hard examples: scams that borrow legit wording and legit ads that share neutral "risky-looking" lines.
-    if rng.random() < 0.25:
-        other = "legit" if label == "scam" else "scam"
-        if other == "legit":
-            parts.insert(2, pick(P["legit"]["any"][:3]))
-    if rng.random() < 0.35:
+    # Hard examples: scams that borrow legit wording, legit ads with "risky-looking" but harmless lines.
+    if label == "scam" and rng.random() < 0.4:
+        parts.insert(2, pick(P["legit"]["any"][:3]))
+    if rng.random() < (0.5 if label == "legit" else 0.35):
         parts.append(pick(P["neutral"]))
-    parts.append(pick(P["close"][label]))
+    # Contact lines are mostly shared so the sign-off cannot give the label away.
+    parts.append(pick(P["contact"]) if rng.random() < 0.6 else pick(P["close"][label]))
     return _render(parts, rng, cat, label)
 
 
@@ -442,8 +454,10 @@ def generate_shifted(n: int, seed: int) -> pd.DataFrame:
             label = "scam" if rng.random() < 0.5 else "legit"
             parts = [rng.choice(TAMIL["offer"][cat])]
             parts += rng.sample(TAMIL[label], rng.randint(2, 3))
-            parts.append(rng.choice(TAMIL["close"][label]))
-            text, lang, tactic = _render(parts, rng, cat, label), "ta", "tamil"
+            parts.append(rng.choice(TAMIL["contact"]))
+            salary = rng.choice(["மாதம் 5 லட்சம் ரூபாய்", "மாதம் 1.5 லட்சம் ரூபாய்", "மாதம் 3 லட்சம் ரூபாய்",
+                                 "நாளொன்றுக்கு 8 ஆயிரம் ரூபாய்", "மாதம் 90 ஆயிரம் ரூபாய்"])
+            text, lang, tactic = _render(parts, rng, cat, label, salary=salary), "ta", "tamil"
         elif r < 0.8:  # new tactics and destinations
             tactic = rng.choice(list(NEW_TACTICS))
             cat, lines = NEW_TACTICS[tactic]
@@ -459,7 +473,8 @@ def generate_shifted(n: int, seed: int) -> pd.DataFrame:
                 parts = [rng.choice(POOLS[lang]["offer"][cat])]
                 parts += rng.sample(POOLS[lang]["legit"][cat] + POOLS[lang]["legit"]["any"], 2)
                 parts.append(rng.choice(POOLS[lang]["close"]["legit"]))
-            text = _render(parts, rng, cat, label, country=country)
+            salary = rng.choice(["USD 2,200", "THB 35,000", "RUB 180,000", "USD 1,650", "EUR 1,300", "GEL 2,000"])
+            text = _render(parts, rng, cat, label, country=country, salary=salary)
         else:  # ordinary traffic
             lang = rng.choices(["en", "singlish", "si"], [0.5, 0.3, 0.2])[0]
             cat = rng.choice(CATEGORIES)
