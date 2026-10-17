@@ -2,7 +2,7 @@
 
 Everything is synthetic (Rule 2.4): agencies and licence numbers are the fictional demo ones (9xxx, never a real
 SLBFE licence), phone numbers are placeholders, and voices are Windows text-to-speech.
-Run on Windows: python demo/make_demo_media.py   -> demo/media/
+Run on Windows: python demo/make_demo_media.py   -> demo/media/  (expected result: every scam file HIGH, every legit file LOW)
 """
 
 import subprocess
