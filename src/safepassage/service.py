@@ -15,6 +15,14 @@ from .schema import Risk, ScanResult
 from .verify import verify
 
 _model: ScamModel | None = ScamModel() if MODEL_PATH.exists() else None
+_VERSION_FILE = MODEL_PATH.parent / "CURRENT_VERSION"
+
+
+def _version_stamp() -> int | None:
+    return _VERSION_FILE.stat().st_mtime_ns if _VERSION_FILE.exists() else None
+
+
+_loaded_stamp = _version_stamp()
 
 
 def model_loaded() -> bool:
@@ -22,14 +30,22 @@ def model_loaded() -> bool:
 
 
 def reload_model() -> bool:
-    """Pick up a freshly trained model without restarting the service."""
-    global _model
+    """Pick up freshly promoted models without restarting the service: the scam model plus the cached novelty
+    index, drift reference and category model."""
+    global _model, _loaded_stamp
+    from . import drift, extract, novelty as novelty_module
+
+    for cached in (novelty_module._index, drift.load_reference, extract._category_model):
+        getattr(cached, "cache_clear", lambda: None)()  # tests may swap these for plain functions
+    _loaded_stamp = _version_stamp()
     _model = ScamModel() if MODEL_PATH.exists() else None
     return model_loaded()
 
 
 def scan_text(text: str, source: str = "text", url: str | None = None, media: str | None = None) -> ScanResult:
     """`media` ("audio" / "image") marks text that was transcribed or OCR'd, so analysts know what they read."""
+    if _version_stamp() != _loaded_stamp:  # another process (the scheduler) promoted or rolled back a model
+        reload_model()
     flags = find_red_flags(text)
     # Until Person A ships a model, fall back to a crude red-flag score so the pipeline runs end to end.
     p = _model.score(text) if _model else min(1.0, 0.2 + 0.15 * len(flags))
