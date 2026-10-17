@@ -15,10 +15,17 @@ def drift_active() -> bool:
     return last == "drift_detected"
 
 
+CLEAR_MARGIN = 0.8  # once drifting, every signal must fall below 80% of its threshold before the alert clears
+
+
 def check_drift() -> dict:
-    """Recompute drift; alert only when the state changes so the log isn't flooded."""
+    """Recompute drift; alert only when the state changes so the log isn't flooded.
+    Hysteresis: a window that dips just under a threshold doesn't clear an active alert, so it can't flap."""
     report = drift_report()
     now = report["n"] >= config.DRIFT_MIN_SCANS and report["drift"]
+    if not now and drift_active():
+        sig, thr = report.get("signals", {}), report.get("thresholds", {})
+        now = any(sig.get(k, 0.0) >= CLEAR_MARGIN * t for k, t in thr.items())
     if now != drift_active():
         raise_alert("drift_detected" if now else "drift_cleared", report)
     return {**report, "drift": now}
