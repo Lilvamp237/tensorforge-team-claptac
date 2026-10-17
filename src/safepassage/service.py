@@ -3,7 +3,7 @@
 import uuid
 from typing import NamedTuple
 
-from . import reputation, trust
+from . import config, reputation, trust
 from .config import MODEL_PATH, NOVELTY_THRESHOLD
 from .extract import extract_content
 from .features import describe, find_red_flags
@@ -54,8 +54,9 @@ def scan_text(text: str, source: str = "text", url: str | None = None, media: st
 
     content = extract_content(text)
     verification = verify(text, content)
-    p, trust_notes = trust.adjust(p, verification, flags)
-    indicators = trust_notes + indicators
+    if config.TRUST_ADJUSTMENT:
+        p, trust_notes = trust.adjust(p, verification, flags)
+        indicators = trust_notes + indicators
 
     # Analyst decisions come last, so a blocklisted site stays high risk even if its agency verifies.
     listing = reputation.status(url) if url else None
