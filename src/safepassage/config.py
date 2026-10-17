@@ -22,8 +22,8 @@ MODEL_VERSION = "safepassage-0.1.0"
 CATEGORIES = ["local_job", "foreign_job", "student_visa", "visa_pr"]
 
 # P(scam) thresholds: >= HIGH is high risk, >= MEDIUM is medium risk and goes to human review.
-# HIGH_RISK 0.65 sits next to the validation threshold for recall >= 0.9 (0.634, reports/eval.json); anything >= 0.4
-# is flagged either way, HIGH only moves offers between "high" and the review band.
+# HIGH_RISK 0.65: recall-leaning, inside the team's 0.64-0.7 range (on test: 82% of scams "high", 9% of legit).
+# Anything >= 0.4 is flagged either way; HIGH only moves offers between "high" and the review band.
 HIGH_RISK = 0.65
 MEDIUM_RISK = 0.4
 NOVELTY_THRESHOLD = 0.6
